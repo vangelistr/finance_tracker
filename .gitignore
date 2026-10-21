@@ -1,0 +1,12 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Local-only docs (infrastructure details, local paths, domain names)
+docs/SERVER-NOTES.md
+docs/PROMPT.md
+
+# Dependencies and build output (Phase 1 extends this list)
+node_modules/
+.next/
