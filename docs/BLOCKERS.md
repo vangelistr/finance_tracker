@@ -89,3 +89,11 @@ Each item says why and what the user can do. Newest phase last.
   ("first release verification").
 - **User action:** After merging, check the Release run and that `ghcr.io/<owner>/finance_tracker` and
   `…/finance_tracker-backup` exist as private packages.
+
+### B-010 MongoDB 7.0 reaches end of life on 2027-08-31
+
+- **What:** MongoDB 8.0/9.0 refuse to start on Linux kernels 6.19–7.0.13 (D-036), so the stack runs MongoDB 7.0.45.
+- **User action before 2027-08-31:** when your server kernel is 7.0.14+ (or below 6.19) and MongoDB has resolved
+  SERVER-136848 for Ubuntu kernels, upgrade to the current 8.0.x: take a backup (`docker compose exec backup backup-now`),
+  change the image tag in `docker-compose.yml` and `docker/backup/Dockerfile`, start, then run
+  `db.adminCommand({ setFeatureCompatibilityVersion: "8.0", confirm: true })` as the root user.

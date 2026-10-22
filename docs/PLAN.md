@@ -74,7 +74,7 @@ tests/                  unit (vitest), integration (vitest + real Mongo), e2e (P
 | Framework | Next.js (App Router, Turbopack, `output: 'standalone'`) | 16.4.2 |
 | UI | React / React DOM | 19.3.1 |
 | Language | TypeScript, `strict` (TS 7 not supported by typescript-eslint yet) | 6.0.3 |
-| Database | MongoDB server (image `mongo:8.0.34-noble`) / Node driver | 8.0.34 / 7.7.0 |
+| Database | MongoDB server (image `mongo:7.0.45-jammy`, D-036) / Node driver | 7.0.45 / 7.7.0 |
 | Validation | zod | 4.6.7 |
 | Auth primitives | `@node-rs/argon2` (argon2id), `otpauth` (TOTP), `qrcode` (enrolment QR) | 2.2.2 / 9.5.2 / 1.5.4 |
 | Push | `web-push` (VAPID) | 3.6.7 |
@@ -88,7 +88,7 @@ tests/                  unit (vitest), integration (vitest + real Mongo), e2e (P
 | Backups | restic (pinned binary, checksum-verified), mongo tools from the mongo image | see §10 |
 
 Every dependency is pinned to an exact version in `package.json` and logged with a one-line reason in
-`docs/DECISIONS.md` when it is added. MongoDB 9.0 exists (9.0.4); 8.0 is chosen as the mature release line.
+`docs/DECISIONS.md` when it is added. MongoDB 7.0 is used because 8.0/9.0 exit at start-up on Linux kernels 6.19–7.0.13 (D-036).
 
 ## 4. MongoDB collections and indexes
 
@@ -400,7 +400,7 @@ Module off by default; while off, the market client is never constructed and a t
 Research and full design: `docs/research/backup-r2-restic.md` (section 7 is the build specification).
 
 - **Image** `docker/backup/`: builder stage downloads restic 0.19.1 and verifies the GPG signature and the pinned
-  SHA-256; final stage `FROM mongo:8.0.34-noble` (mongodump/mongorestore/mongosh/mongod included) plus
+  SHA-256; final stage `FROM mongo:7.0.45-jammy` (mongodump/mongorestore/mongosh/mongod included) plus
   `openssh-client`. No Docker socket, no published port, `TZ=Europe/Athens`.
 - **Backup**: `mongodump --db finance --archive` (no `--gzip`, so restic can deduplicate and compress) streamed into
   `restic backup --stdin-from-command --stdin-filename finance.archive --host finance-tracker --tag mongodb`.
@@ -438,7 +438,7 @@ Limits, pinned SHAs, security-tool notes and the minutes estimate: `docs/researc
   `persist-credentials: false`). Docs-only changes skip work through a `changes` job, not trigger `paths-ignore`,
   so required checks never hang:
   - `static`: lint, typecheck, `npm audit --audit-level=critical`, actionlint (checksum-pinned binary);
-  - `test`: Vitest unit + integration with a `mongo:8.0.34-noble` service container;
+  - `test`: Vitest unit + integration with a `mongo:7.0.45-jammy` service container;
   - `secrets`: gitleaks 8.30.1 (checksum-pinned binary, full history);
   - `image`: buildx build (`type=gha` cache), Trivy 0.76.1 binary (CRITICAL only, `.trivyignore`), and from Phase 2
     the e2e smoke (Playwright against `docker compose`) on pull requests and `main`;

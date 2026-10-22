@@ -225,3 +225,18 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
   (`eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces`); the suggested fix
   downgrades `eslint-config-next` to 14.x, which would break linting on Next 16. Left to Dependabot; not shipped in
   the image.
+
+### D-036 MongoDB 7.0.45 instead of 8.0.34 (kernel incompatibility)
+- **Found:** the first CI run failed because `mongo:8.0.34` exits at start-up on the GitHub runner: "MongoDB cannot
+  start: Linux kernel versions 6.19 and newer has a known incompatibility with this version of MongoDB"
+  (SERVER-121912, TCMalloc and the kernel's rseq ABI).
+- **Source:** the compatibility matrix in https://jira.mongodb.org/browse/SERVER-125742 (read 2026-10-22): on kernels
+  6.19–7.0.13 every 8.0.21+, 8.3 and 9.0 build exits during start-up and 8.0.0–8.0.20 may crash with possible
+  corruption; **MongoDB 7.0 (all versions) is fully supported on every kernel range**. Kernel 7.0.14+ is fine again for
+  8.0.35+ / 9.0, but SERVER-136848 (open) reports that the start-up check still blocks Ubuntu's 7.0.14-based kernels.
+- **Decision:** run MongoDB **7.0.45** (`mongo:7.0.45-jammy`, pinned by digest) in Compose, the backup image and CI.
+  The server runs Ubuntu 24.04; a routine kernel update into the affected range would otherwise stop the database.
+  The app uses nothing that needs 8.0. Local checks re-run on 7.0: 78 tests, full stack healthy, all backup checks PASS,
+  Trivy CRITICAL gate clean.
+- **Lifecycle:** MongoDB 7.0 is supported until 2027-08-31 (https://www.mongodb.com/legal/support-policy/lifecycles,
+  read via search 2026-10-22). Upgrade path in `docs/BLOCKERS.md` B-010.

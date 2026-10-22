@@ -2,7 +2,7 @@
 # Backup service: mongodump streamed into restic (client-side encrypted), on a schedule in Europe/Athens.
 # Based on the same mongo image as the database, so mongodump/mongorestore/mongosh/mongod versions match.
 
-ARG MONGO_IMAGE=mongo:8.0.34-noble@sha256:c2d54fddfb3738fb27fe117f51692e3f44e640a3e7aeb8da3937ee9cd33a650b
+ARG MONGO_IMAGE=mongo:7.0.45-jammy@sha256:7fba8c37d681a79f22a85d2b06bd5ed121a7973c0a6ca20ed4887bb0a1548ce0
 
 FROM ${MONGO_IMAGE} AS restic
 ARG TARGETARCH
