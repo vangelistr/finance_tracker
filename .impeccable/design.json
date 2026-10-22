@@ -145,6 +145,14 @@
       "label": {
         "displayName": "Label",
         "purpose": "Field labels, segmented controls."
+      },
+      "nav": {
+        "displayName": "Nav",
+        "purpose": "Desktop rail items."
+      },
+      "micro": {
+        "displayName": "Micro",
+        "purpose": "Month-line ticks, interchange counts, bottom-bar labels."
       }
     },
     "shadows": [

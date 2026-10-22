@@ -8,11 +8,14 @@ export async function PublicFrame({
   title,
   intro,
   showLocale = true,
+  wide = false,
   children,
 }: {
   title: string;
   intro?: ReactNode;
   showLocale?: boolean;
+  /** Onboarding needs room for lists; sign-in forms stay narrow. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   const t = await getTranslations('app');
@@ -25,7 +28,7 @@ export async function PublicFrame({
         <LineMotif />
         <p className="hidden px-10 pb-10 text-lg text-rail-ink-2 lg:absolute lg:bottom-0 lg:block lg:max-w-sm">{t('tagline')}</p>
       </header>
-      <main id="main" className="mx-auto flex w-full max-w-md flex-col gap-6 px-5 py-8 lg:justify-center lg:py-16">
+      <main id="main" className={`mx-auto flex w-full flex-col gap-6 px-5 py-8 lg:justify-center lg:py-16 ${wide ? 'max-w-2xl' : 'max-w-md'}`}>
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-semibold tracking-[-0.015em]">{title}</h1>
           {showLocale && <LocaleSwitch className="shrink-0" />}

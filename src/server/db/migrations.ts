@@ -18,6 +18,13 @@ export const MIGRATIONS: Migration[] = [
       // Indexes only (created by ensureIndexes). Kept as a marker for the first schema version.
     },
   },
+  {
+    id: '0002-finance-core',
+    up: async () => {
+      // Phase 2 collections; their indexes come from ensureIndexes. Users created before this migration get their
+      // default categories when they open onboarding or the categories page (seedCategories is idempotent).
+    },
+  },
 ];
 
 export async function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): Promise<string[]> {

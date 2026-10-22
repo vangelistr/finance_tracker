@@ -3,6 +3,7 @@ import { MongoServerError, ObjectId } from 'mongodb';
 import { DEFAULT_TIMEZONE } from '@/lib/dates';
 import { col } from '@/server/db/collections';
 import type { Locale, Role, UserDoc, UserSettings } from '@/server/db/types';
+import { seedCategories } from '@/server/services/categories';
 import { hashPassword, verifyDummy, verifyPassword } from './password';
 
 export function defaultSettings(investingEnabled = false): UserSettings {
@@ -82,6 +83,7 @@ export async function createOwner(input: NewUserInput, now = new Date()): Promis
     await appMeta.deleteOne({ _id: 'setup' });
     throw err;
   }
+  await seedCategories(user._id, user.locale, now);
   return user;
 }
 
@@ -94,6 +96,7 @@ export async function createMember(input: NewUserInput, now = new Date()): Promi
     if (err instanceof MongoServerError && err.code === 11000) throw new EmailTakenError();
     throw err;
   }
+  await seedCategories(user._id, user.locale, now);
   return user;
 }
 

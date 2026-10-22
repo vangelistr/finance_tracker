@@ -57,6 +57,15 @@ export function MonthLine({ month, today, stations, summary, todayLabel, classNa
       </svg>
       {/* Stations and labels are HTML so circles stay round whatever the width */}
       <div aria-hidden className="relative -mt-[72px] h-[72px]">
+        {todayDay && (
+          <>
+            {/* You are here: a tick through the line, drawn under the stations so none is hidden */}
+            <span className="absolute top-[16px] h-6 w-0.5 -translate-x-1/2 rounded-full bg-ink" style={{ left: `${(x(todayDay) / W) * 100}%` }} />
+            <span className="absolute top-[44px] -translate-x-1/2 text-xs font-semibold text-ink" style={{ left: `${(x(todayDay) / W) * 100}%` }}>
+              {todayLabel}
+            </span>
+          </>
+        )}
         {[...byDay.entries()].map(([day, list]) => {
           const left = `${(x(day) / W) * 100}%`;
           if (list.length === 1) {
@@ -75,25 +84,13 @@ export function MonthLine({ month, today, stations, summary, todayLabel, classNa
             <span
               key={day}
               title={list.map((s) => s.label).join(', ')}
-              className="num absolute top-[28px] flex h-4.5 min-w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[2.5px] border-ink px-1 text-[0.625rem] leading-none font-semibold"
+              className="num absolute top-[28px] flex h-4.5 min-w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-[2.5px] border-ink px-1 text-[0.6875rem] leading-none font-semibold"
               style={{ left, background: allDone ? 'var(--ink)' : 'var(--surface)', color: allDone ? 'var(--surface)' : 'var(--ink)' }}
             >
               {list.length}
             </span>
           );
         })}
-        {todayDay && (
-          <>
-            {/* You are here: the train on the line */}
-            <span
-              className="absolute top-[28px] h-2.5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink ring-[3px] ring-surface"
-              style={{ left: `${(x(todayDay) / W) * 100}%` }}
-            />
-            <span className="absolute top-[42px] -translate-x-1/2 text-xs font-semibold text-ink" style={{ left: `${(x(todayDay) / W) * 100}%` }}>
-              {todayLabel}
-            </span>
-          </>
-        )}
         {ticks.map((d) => (
           <span
             key={d}

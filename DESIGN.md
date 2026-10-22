@@ -56,6 +56,17 @@ typography:
     fontSize: "0.875rem"
     fontWeight: 500
     lineHeight: "1.25rem"
+  nav:
+    fontFamily: "'Source Sans 3 Variable', 'Segoe UI', system-ui, sans-serif"
+    fontSize: "0.9375rem"
+    fontWeight: 400
+    lineHeight: "1.25rem"
+  micro:
+    fontFamily: "'Source Sans 3 Variable', 'Segoe UI', system-ui, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 500
+    lineHeight: "1rem"
+    fontFeature: "'tnum' 1"
 rounded:
   sm: "4px"
   md: "6px"
@@ -170,6 +181,9 @@ violet tax). Warning amber and danger red always come with an icon and words.
 - **Title** (600, 1.125rem): section headings under a hairline.
 - **Body** (400, 1rem / 1.5rem): text and controls; prose capped near 65ch.
 - **Label** (500, 0.875rem): field labels and segmented controls.
+- **Nav** (400, 0.9375rem; 600 when current): desktop rail items.
+- **Micro** (500, 0.6875rem, tabular): month-line day ticks and interchange counts, phone bottom-bar labels. Never for
+  body text.
 
 ### Named Rules
 **The Even Columns Rule.** Every amount uses tabular figures (`tnum`) and a true minus sign (U+2212); a test asserts
@@ -222,9 +236,25 @@ switches. Lines end in round caps.
 - **Segmented:** a sunk track; the chosen segment gets the soft blue fill, a blue hairline and semibold text.
 - **Switch:** a full-width labelled row; the track fills Action Blue when on.
 
+### Ledger rows
+- Grouped by day under a one-pixel rule, day name on the left and the day's net on the right.
+- Each row: station mark (hollow expected, filled done), label with category and account below, amount right-aligned in
+  tabular figures; income in line green with a plus sign, expected amounts in tertiary ink. Expected rows carry a
+  secondary "Received"/"Paid" button. Rows are 56px tall.
+
+### Quick-add sheet
+- Bottom sheet opened from the central round Add button (phone) or the rail's primary button (desktop). Large amount
+  field with the decimal keypad, category chips (most recent first, colour dot from the chart palette), Today/Yesterday
+  chips plus a date field, account, optional note, one primary Save. Offline it saves to the device queue and says so.
+
+### Calendar
+- Desktop: a Monday-first month grid with one-pixel cell rules; today is an ink disc; up to three items per day with
+  station marks, then "+n". Phone: an agenda drawn as a vertical line (solid ink for days passed, rule colour ahead),
+  each day a station with its items. Tapping a day opens a sheet to confirm or add.
+
 ### The Month Line (signature)
 A horizontal line across the month with day ticks (1, 10, 20, last). The travelled part is solid ink, the rest a strong
-rule; today is a small dark capsule (the train) with "today" beneath. Stations sit on their day: hollow ring in the
+rule; today is an ink tick through the line with "today" beneath, drawn under the stations so none is hidden. Stations sit on their day: hollow ring in the
 item's line colour while expected, filled when done; several items on one day form an interchange pill with a count.
 
 ## Do's and Don'ts

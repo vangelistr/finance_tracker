@@ -240,3 +240,33 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
   Trivy CRITICAL gate clean.
 - **Lifecycle:** MongoDB 7.0 is supported until 2027-08-31 (https://www.mongodb.com/legal/support-policy/lifecycles,
   read via search 2026-10-22). Upgrade path in `docs/BLOCKERS.md` B-010.
+
+## Phase 2 (2026-10-22)
+
+### D-037 Recurring generation window and edits
+- Expected occurrences are generated from the month a source was created (never older history) to the end of next
+  month, keyed `income|expense:<sourceId>:<localDate>` with a unique partial index and `$setOnInsert` upserts, by the
+  hourly worker job and on every page that shows the month. Editing, pausing or cancelling a source deletes only its
+  future expected generated rows and regenerates them; confirmed and skipped rows are never touched. Deleting a
+  generated row marks it `skipped`, so it is never generated again. The calendar projects later months on the fly
+  without writing rows.
+
+### D-038 Categories seeded per user at account creation
+- Greek or English names by the user's locale at creation, with a `seedKey` (`expense:home/rent`), colours from the
+  8-colour chart palette and an `essential` flag for the Smart Plan. Seeding is idempotent by `seedKey`; a user's own
+  category with the same name wins. Used categories are archived instead of deleted.
+
+### D-039 Transfers and balances
+- A transfer is one transaction (`kind: transfer`, `accountId` → `toAccountId`), so it never counts as income or
+  spending. Balance = opening balance + done income − done expenses − transfers out + transfers in.
+
+### D-040 Quick-add and the offline queue
+- Every quick-add carries a client UUID; the server keeps `{userId, clientId}` unique and returns the first row on a
+  repeat, so a replay or a double tap never duplicates. When the API cannot be reached, the expense goes to IndexedDB
+  (`finance-offline/queue`, shared with the service worker) with the CSRF token; it is replayed by Background Sync where
+  supported and always by the page on start and on `online`. The offline page reads cached category and account names
+  (no amounts) from the same database.
+
+### D-041 CI e2e smoke inside the image job
+- The smoke test runs against `docker compose` started from the images the job just built (no second build), with
+  throwaway secrets generated in the job, so no repository secret is needed.

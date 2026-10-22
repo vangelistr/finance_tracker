@@ -1,9 +1,10 @@
 # Progress
 
 Last updated: 2026-10-22
-Status: **Phases 0 and 1 done. Next: Phase 2 (Core).**
+Status: **Phases 0–2 done. Next: Phase 3 (Dashboard, charts, budgets).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 1: foundation" commit on `build/finance-tracker` (Phase 0: `6f22361`).
+Last verified commit: the "Phase 2: core" commit on `build/finance-tracker`. CI on GitHub was green for Phase 1 at `c0aed5b`
+(after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
 
 ## Phases
 
@@ -11,7 +12,7 @@ Last verified commit: the "Phase 1: foundation" commit on `build/finance-tracker
 |-------|--------|--------|
 | 0 Research and plan | done | `6f22361` |
 | 1 Foundation | done | "Phase 1: foundation" (see `git log`) |
-| 2 Core | not started | — |
+| 2 Core | done | "Phase 2: core" (see `git log`) |
 | 3 Dashboard, charts, budgets | not started | — |
 | 4 Notification worker | not started | — |
 | 5 Savings goals + Smart Plan | not started | — |
@@ -54,6 +55,19 @@ queue (the service worker already replays a queue from IndexedDB).
 Next: Phase 2 (Core) — income/expense/accounts/categories CRUD with Greek seed categories, recurring generation
 (idempotent), subscriptions, calendar (month grid + mobile agenda as a vertical month line), quick-add + offline queue,
 onboarding data steps, CI e2e smoke job (Playwright against `docker compose`).
+
+## Phase 2 summary (Core)
+
+Verified on 2026-10-22: `npx vitest run` 78 tests (adds recurrence, calendar month/DST edges, finance integration:
+category seeding, CRUD and isolation for accounts, categories, sources, fixed costs, transactions, transfers and
+balances, idempotent generation under repeated and concurrent runs, skip persistence, paused subscriptions, confirm,
+client-id de-duplication, calendar projection and isolation); lint and typecheck clean; `npm run screenshots` (52
+captures + quick-add, axe 0 violations, offline queue syncs once, PWA checks); `tests/e2e/smoke.spec.ts` passes against
+`docker compose`; `impeccable detect` 0 findings. Design review: `docs/design-reviews/phase-2.md`.
+
+Next: Phase 3 — budgets (per category and overall, monthly), dashboard charts as server-rendered SVG (donut expenses
+by category and income by source, bars income vs expenses per month, line net worth, budget progress bars) with a
+date-range filter and fixture tests that assert every chart's totals.
 
 ## Open issues
 

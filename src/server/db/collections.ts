@@ -2,7 +2,12 @@ import 'server-only';
 import type { Collection, Db, IndexDescription } from 'mongodb';
 import { getDb } from './client';
 import type {
+  AccountDoc,
   AppMetaDoc,
+  CategoryDoc,
+  IncomeSourceDoc,
+  RecurringExpenseDoc,
+  TransactionDoc,
   BackupRunDoc,
   InviteDoc,
   MigrationDoc,
@@ -26,6 +31,11 @@ export function collectionsOf(db: Db) {
     notifications: db.collection<NotificationDoc>('notifications'),
     notificationLog: db.collection<NotificationLogDoc>('notification_log'),
     backupRuns: db.collection<BackupRunDoc>('backup_runs'),
+    accounts: db.collection<AccountDoc>('accounts'),
+    categories: db.collection<CategoryDoc>('categories'),
+    incomeSources: db.collection<IncomeSourceDoc>('income_sources'),
+    recurringExpenses: db.collection<RecurringExpenseDoc>('recurring_expenses'),
+    transactions: db.collection<TransactionDoc>('transactions'),
   };
 }
 
@@ -59,6 +69,35 @@ export const INDEXES: Record<string, IndexDescription[]> = {
     { key: { createdAt: 1 }, name: 'ttl', expireAfterSeconds: 400 * DAY },
   ],
   backup_runs: [{ key: { startedAt: -1 }, name: 'started' }],
+  accounts: [{ key: { userId: 1, archived: 1, sort: 1 }, name: 'user_list' }],
+  categories: [
+    { key: { userId: 1, kind: 1, parentId: 1, sort: 1 }, name: 'user_tree' },
+    {
+      key: { userId: 1, kind: 1, parentId: 1, name: 1 },
+      name: 'user_name_unique',
+      unique: true,
+      collation: { locale: 'el', strength: 2 },
+    },
+  ],
+  income_sources: [{ key: { userId: 1, active: 1 }, name: 'user_active' }],
+  recurring_expenses: [{ key: { userId: 1, active: 1 }, name: 'user_active' }],
+  transactions: [
+    { key: { userId: 1, localDate: -1 }, name: 'user_date' },
+    { key: { userId: 1, month: 1, kind: 1 }, name: 'user_month_kind' },
+    { key: { userId: 1, categoryId: 1, month: 1 }, name: 'user_category_month' },
+    {
+      key: { userId: 1, occurrenceKey: 1 },
+      name: 'user_occurrence_unique',
+      unique: true,
+      partialFilterExpression: { occurrenceKey: { $type: 'string' } },
+    },
+    {
+      key: { userId: 1, clientId: 1 },
+      name: 'user_client_unique',
+      unique: true,
+      partialFilterExpression: { clientId: { $type: 'string' } },
+    },
+  ],
 };
 
 export async function ensureIndexes(db: Db): Promise<void> {

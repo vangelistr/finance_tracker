@@ -14,7 +14,8 @@ import { BOTTOM_BAR_KEYS, isActive, NAV, type NavItem } from './nav';
 interface AppShellProps {
   userName: string;
   investingEnabled: boolean;
-  quickAdd?: ReactNode;
+  quickAdd?: { rail: ReactNode; bar: ReactNode };
+  banner?: ReactNode;
   children: ReactNode;
 }
 
@@ -22,7 +23,7 @@ interface AppShellProps {
  * Desktop: a navy rail on the left. Phone: a bottom bar with the main destinations around a central Add,
  * and everything else under More.
  */
-export function AppShell({ userName, investingEnabled, quickAdd, children }: AppShellProps) {
+export function AppShell({ userName, investingEnabled, quickAdd, banner, children }: AppShellProps) {
   const t = useTranslations('nav');
   const tApp = useTranslations('app');
   const tc = useTranslations('common');
@@ -52,7 +53,7 @@ export function AppShell({ userName, investingEnabled, quickAdd, children }: App
           <div className="px-5 pt-6 pb-5">
             <Wordmark name={tApp('name')} />
           </div>
-          {quickAdd && <div className="px-4 pb-4">{quickAdd}</div>}
+          {quickAdd && <div className="px-4 pb-4">{quickAdd.rail}</div>}
           <nav aria-label={t('main')} className="flex-1 overflow-y-auto px-3">
             <ul className="flex flex-col gap-0.5">
               {items.map((item) => (
@@ -79,6 +80,7 @@ export function AppShell({ userName, investingEnabled, quickAdd, children }: App
 
       <div className="flex min-h-dvh min-w-0 flex-col">
         <main id="main" className="mx-auto w-full max-w-[72rem] flex-1 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-28 sm:px-6 lg:px-10 lg:pt-8 lg:pb-12">
+          {banner}
           {children}
         </main>
       </div>
@@ -92,7 +94,7 @@ export function AppShell({ userName, investingEnabled, quickAdd, children }: App
             </li>
           ))}
           {barItems.length < 2 && <li aria-hidden />}
-          <li className="grid place-items-center">{quickAdd}</li>
+          <li className="grid place-items-center">{quickAdd?.bar}</li>
           {barItems.slice(2, 3).map((item) => (
             <li key={item.key}>
               <BarLink item={item} label={t(item.key)} active={isActive(pathname, item.href)} />

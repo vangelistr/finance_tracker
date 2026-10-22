@@ -148,7 +148,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     permissions:
       contents: read
     steps:
@@ -200,6 +200,39 @@ jobs:
           for img in finance-tracker:ci finance-tracker-backup:ci; do
             ./trivy image --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 --ignorefile .trivyignore "$img"
           done
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Start the stack from the images built above (generated throwaway secrets)
+        run: |
+          set -euo pipefail
+          cp .env.example .env
+          setv() { sed -i "s|^$1=.*|$1=$2|" .env; }
+          setv IMAGE_NAME finance-tracker
+          setv IMAGE_TAG ci
+          for k in SESSION_SECRET DATA_ENCRYPTION_KEY MONGO_ROOT_PASSWORD MONGO_APP_PASSWORD RESTIC_PASSWORD; do setv "$k" "$(openssl rand -hex 32)"; done
+          docker compose up -d --no-build
+          for _ in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:3000/api/ready >/dev/null; then break; fi
+            sleep 3
+          done
+          curl -sf http://127.0.0.1:3000/api/ready
+          docker compose ps
+          test -z "$(docker port finance-mongo-1)"
+      - name: Playwright browser
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.playwright-browsers
+        run: npx playwright install --with-deps chromium
+      - name: e2e smoke (Playwright against docker compose)
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.playwright-browsers
+          E2E_BASE_URL: http://localhost:3000
+        run: npx playwright test tests/e2e/smoke.spec.ts
+      - name: Compose logs
+        if: failure()
+        run: docker compose logs --no-color --tail 200
 
   ci-success:
     needs: [changes, static, test, secrets, image]
