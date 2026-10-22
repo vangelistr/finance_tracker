@@ -1,0 +1,130 @@
+# Finance Tracker stack. Own Compose project, own networks, own MongoDB.
+#   Local build:   docker compose up -d --build
+#   Server (CD):   deploy/deploy.sh <tag>   (pulls ${IMAGE_NAME}:${IMAGE_TAG}, never "latest")
+# The app is published on 127.0.0.1 only; Docker-published ports bypass UFW, so never 0.0.0.0.
+# MongoDB has no published port and sits on an internal network with no route to the internet.
+
+name: ${COMPOSE_PROJECT_NAME:-finance}
+
+x-app-image: &app-image
+  image: ${IMAGE_NAME:-finance-tracker}:${IMAGE_TAG:-local}
+  build:
+    context: .
+    args:
+      APP_VERSION: ${IMAGE_TAG:-local}
+
+x-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp:size=64m
+  cap_drop: [ALL]
+  security_opt: ['no-new-privileges:true']
+  init: true
+
+x-app-env: &app-env
+  env_file: .env
+  environment:
+    TZ: Europe/Athens
+    MONGO_URL: ''
+
+services:
+  mongo:
+    image: mongo:8.0.34-noble@sha256:c2d54fddfb3738fb27fe117f51692e3f44e640a3e7aeb8da3937ee9cd33a650b
+    command: ['--wiredTigerCacheSizeGB', '0.25']
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-finance}
+      MONGO_APP_USER: ${MONGO_APP_USER:?set MONGO_APP_USER in .env}
+      MONGO_APP_PASSWORD: ${MONGO_APP_PASSWORD:?set MONGO_APP_PASSWORD in .env}
+      TZ: Europe/Athens
+    volumes:
+      - mongo_data:/data/db
+      - ./docker/mongo-init:/docker-entrypoint-initdb.d:ro
+    networks: [internal]
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--norc', '--eval', "quit(db.adminCommand('ping').ok ? 0 : 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    mem_limit: 768m
+
+  migrate:
+    <<: [*app-image, *app-env, *hardening]
+    command: ['node', 'dist/migrate.mjs']
+    networks: [internal]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: 'no'
+
+  app:
+    <<: [*app-image, *app-env, *hardening]
+    ports:
+      - '127.0.0.1:${APP_HOST_PORT:-3000}:3000'
+    networks: [internal, edge]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    mem_limit: 512m
+
+  worker:
+    <<: [*app-image, *app-env, *hardening]
+    command: ['node', 'dist/worker.mjs']
+    networks: [internal, edge]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      # Healthy while the heartbeat file is younger than two minutes.
+      test: ['CMD', 'node', '-e', "const fs=require('fs');try{process.exit(Date.now()-Number(fs.readFileSync(process.env.WORKER_HEARTBEAT_FILE,'utf8'))<120000?0:1)}catch{process.exit(1)}"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    mem_limit: 384m
+
+  backup:
+    image: ${IMAGE_NAME:-finance-tracker}-backup:${IMAGE_TAG:-local}
+    build:
+      context: docker/backup
+    env_file: .env
+    environment:
+      TZ: Europe/Athens
+      # mongosh and ssh write small files under $HOME; the root filesystem is read-only.
+      HOME: /tmp
+    volumes:
+      - backup_repo:/backups/restic
+      - backup_cache:/var/cache/restic
+      - backup_state:/var/lib/backup
+    networks: [internal, edge]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      # Room for the temporary mongod used by the monthly restore test.
+      - /tmp:size=512m
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    init: true
+    # A configuration error exits 78; stop retrying after three attempts instead of looping.
+    restart: on-failure:3
+    mem_limit: 768m
+
+networks:
+  # No route out: only the services inside talk to MongoDB.
+  internal:
+    internal: true
+  # Outbound for web push, market data and FX (app and worker only).
+  edge: {}
+
+volumes:
+  mongo_data:
+  backup_repo:
+  backup_cache:
+  backup_state:

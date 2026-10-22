@@ -71,3 +71,21 @@ Each item says why and what the user can do. Newest phase last.
 - **What:** The brief says "add build provenance only if it is free for private repos [verify]".
   `actions/attest-build-provenance` requires GitHub Enterprise Cloud for private repositories.
 - **Decision:** Skipped. BuildKit's own SLSA provenance (`mode=max`) and SBOM are attached to pushed images at no cost.
+
+## Phase 1
+
+### B-008 Next.js telemetry ran during the first local builds
+
+- **What:** Next.js telemetry was enabled on the build machine. The first few local Next.js commands of Phase 1
+  ran before `NEXT_TELEMETRY_DISABLED=1` was added, so anonymous Next.js usage events may have been sent.
+  They carry no project code, financial data or secrets (Next.js telemetry documentation).
+- **Fix in place:** every script, the image and CI now set `NEXT_TELEMETRY_DISABLED=1` (D-031).
+- **User action (optional):** run `npx next telemetry disable` once on your machine to turn it off globally.
+
+### B-009 CI result on GitHub
+
+- **What:** The workflows were verified locally (actionlint, every job's commands). The first GitHub run happens on
+  push; its result is recorded in `docs/PROGRESS.md`. The release workflow runs only after the user merges to `main`
+  ("first release verification").
+- **User action:** After merging, check the Release run and that `ghcr.io/<owner>/finance_tracker` and
+  `…/finance_tracker-backup` exist as private packages.

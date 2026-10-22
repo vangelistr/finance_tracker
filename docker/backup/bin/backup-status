@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Prints the last results and the snapshot list (no secrets).
+source /usr/local/lib/backup/common.sh
+for f in last-success last-backup last-restore-test; do
+  [ -f "$STATE_DIR/$f.json" ] && jq -c --arg f "$f" '{($f): .}' "$STATE_DIR/$f.json"
+done
+r snapshots --host "$BACKUP_HOST" --compact

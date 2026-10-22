@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# restore [--snapshot latest|<id>] --yes
+# Replaces the live finance database with a snapshot. Takes a safety backup first. The backup run log
+# (backup_runs) is kept as it is, so the history of backups survives a restore.
+# Stop app and worker before running it:  docker compose stop app worker
+source /usr/local/lib/backup/common.sh
+
+snapshot=latest
+confirmed=false
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --snapshot) snapshot=$2 && shift 2 ;;
+    --yes) confirmed=true && shift ;;
+    *) die "unknown argument $1" 2 ;;
+  esac
+done
+[ "$confirmed" = true ] || die "restore replaces the live database: re-run with --yes" 2
+
+exec 9>"$LOCK_FILE"
+flock -w 600 9 || die "another backup job holds the lock" 11
+export BACKUP_LOCK_HELD=1
+
+# Resolve the snapshot before the safety backup, or "latest" would point at the safety snapshot itself.
+if [ "$snapshot" = latest ]; then
+  snapshot=$(r snapshots --host "$BACKUP_HOST" --tag mongodb --json | jq -r 'max_by(.time) | .id // empty')
+  [ -n "$snapshot" ] || die "no snapshot to restore"
+fi
+
+log info "taking a safety backup before restore"
+/usr/local/bin/backup --trigger pre-restore --no-prune || die "safety backup failed; restore not started"
+
+cfg=$(mongo_tool_config)
+trap 'rm -f "$cfg"' EXIT
+log info "restoring" --arg snapshot "$snapshot"
+r dump --host "$BACKUP_HOST" "$snapshot" /finance.archive |
+  mongorestore --config "$cfg" --archive --drop --nsInclude "$MONGO_DB.*" --nsExclude "$MONGO_DB.backup_runs" --stopOnError --quiet
+log info "restore finished" --arg snapshot "$snapshot"

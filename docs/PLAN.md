@@ -509,8 +509,8 @@ Phase 1 turns this into PRODUCT.md, tokens, components and DESIGN.md with Impecc
   focus. Line colours do data work: income green, spending red, goals ochre, tax reserve violet; warning amber and
   danger red always come with an icon and text. Expected versus done is hollow versus filled plus a text label, never
   colour alone. Chart palette: 8 categorical hues tuned per theme, at least 3:1 against the surface, always labelled.
-- **Type.** Commissioner (variable, Greek subset, self-hosted from `@fontsource-variable`), one family for
-  everything; hierarchy from size and weight only; tabular figures verified in Phase 1. Fixed rem scale with a ~1.2 ratio.
+- **Type.** Source Sans 3 (variable, Greek subset, self-hosted from `@fontsource-variable`), one family for
+  everything; hierarchy from size and weight only; tabular figures verified by a test (D-032). Fixed rem scale with a ~1.2 ratio.
   Money uses tabular numerals, a true minus sign, right alignment in tables and a lighter currency symbol.
 - **Layout.** Mobile: bottom bar with four destinations and a central Add button. Desktop: left sidebar.
   Content width about 72 rem. The dashboard is a sequence of sections with hairline dividers, not a grid of

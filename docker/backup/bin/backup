@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# backup [--trigger schedule|manual|pre-deploy|pre-restore] [--no-prune]
+# Streams `mongodump --archive` (no gzip, so restic can deduplicate and compress) into restic, records the run in
+# backup_runs and in the state directory, then applies retention unless --no-prune. Exit 0 only on success.
+source /usr/local/lib/backup/common.sh
+
+trigger=manual
+prune=true
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --trigger) trigger=$2 && shift 2 ;;
+    --no-prune) prune=false && shift ;;
+    *) die "unknown argument $1" 2 ;;
+  esac
+done
+
+if [ "${BACKUP_LOCK_HELD:-}" != 1 ]; then
+  exec 9>"$LOCK_FILE"
+  flock -w 600 9 || die "another backup job holds the lock" 11
+fi
+
+runs interrupt-stale TIMEOUT_MINUTES="$BACKUP_TIMEOUT_MINUTES" >/dev/null || true
+run_id=$(runs start RUN_KIND=backup RUN_TRIGGER="$trigger" RUN_OFFSITE="$(offsite)") || die "cannot reach MongoDB to record the run"
+status=failed error="" snapshot="" before="" after=""
+cfg=$(mongo_tool_config)
+trap 'rm -f "$cfg"' EXIT
+
+finish() {
+  runs finish RUN_ID="$run_id" RUN_STATUS="$status" RUN_SNAPSHOT="$snapshot" RUN_ERROR="$error" \
+    RUN_COUNTS_BEFORE="$before" RUN_COUNTS_AFTER="$after" >/dev/null || true
+  jq -n --arg trigger "$trigger" --arg status "$status" --arg snapshot "$snapshot" --arg error "$error" \
+    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson offsite "$(offsite)" \
+    '{kind: "backup", trigger: $trigger, status: $status, snapshot: $snapshot, error: $error, at: $at, offsite: $offsite}' \
+    >"$STATE_DIR/last-backup.json"
+  case "$status" in success | success_with_warning) cp "$STATE_DIR/last-backup.json" "$STATE_DIR/last-success.json" ;; esac
+  log "$([ "$status" = failed ] && echo error || echo info)" "backup finished" --arg status "$status" --arg trigger "$trigger" \
+    --arg snapshot "$snapshot" --arg error "$error"
+  [ "$status" = failed ] && echo "BACKUP FAILED" >&2
+  return 0
+}
+
+if ! (ensure_repo); then
+  error="repository unavailable"
+  finish
+  exit 1
+fi
+
+if ! before=$(runs counts); then
+  error="cannot count documents"
+  finish
+  exit 1
+fi
+
+rc=0
+timeout "${BACKUP_TIMEOUT_MINUTES}m" "$LIB_DIR/restic-target" backup --quiet --host "$BACKUP_HOST" --tag mongodb --tag "$trigger" \
+  --stdin-from-command --stdin-filename finance.archive -- \
+  mongodump --config "$cfg" --db "$MONGO_DB" --archive --numParallelCollections 1 --quiet || rc=$?
+if [ "$rc" -ne 0 ]; then
+  error="restic backup exited $rc"
+  finish
+  exit 1
+fi
+
+after=$(runs counts) || after=""
+snapshot=$(r snapshots --host "$BACKUP_HOST" --tag mongodb --latest 1 --json | jq -r 'max_by(.time) | .id') || snapshot=""
+status=success
+
+if [ "$prune" = true ]; then
+  if ! r forget --quiet --host "$BACKUP_HOST" --tag mongodb --keep-daily "$BACKUP_KEEP_DAILY" \
+    --keep-weekly "$BACKUP_KEEP_WEEKLY" --keep-monthly "$BACKUP_KEEP_MONTHLY" --prune >/dev/null; then
+    status=success_with_warning
+    error="retention (forget --prune) failed"
+  fi
+fi
+finish

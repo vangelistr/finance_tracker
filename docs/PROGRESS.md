@@ -1,16 +1,16 @@
 # Progress
 
 Last updated: 2026-10-22
-Status: **Phase 0 done. Phase 1 (Foundation) in progress.**
+Status: **Phases 0 and 1 done. Next: Phase 2 (Core).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: `64a012a` on `main` (bootstrap). The Phase 0 commit hash is in `git log`.
+Last verified commit: the "Phase 1: foundation" commit on `build/finance-tracker` (Phase 0: `6f22361`).
 
 ## Phases
 
 | Phase | Status | Commit |
 |-------|--------|--------|
-| 0 Research and plan | done | "Phase 0: research and plan" |
-| 1 Foundation | in progress (see below) | — |
+| 0 Research and plan | done | `6f22361` |
+| 1 Foundation | done | "Phase 1: foundation" (see `git log`) |
 | 2 Core | not started | — |
 | 3 Dashboard, charts, budgets | not started | — |
 | 4 Notification worker | not started | — |
@@ -27,43 +27,33 @@ Last verified commit: `64a012a` on `main` (bootstrap). The Phase 0 commit hash i
 - `docs/PLAN.md` complete (all sections, self-reviewed), `docs/DECISIONS.md` D-001…D-028 (Phase 0),
   `docs/BLOCKERS.md` B-001…B-007. `docs/SERVER-NOTES.md` and `docs/PROMPT.md` stay local (gitignored).
 
-## Phase 1: state of the working tree (uncommitted)
+## Phase 1 summary (Foundation)
 
-Done and type-checked:
-- Tooling: `tsconfig.json` (strict, TS 6 needs `types: ["node"]`), `next.config.ts` (standalone, security headers,
-  next-intl plugin), `eslint.config.mjs` (flat, next core-web-vitals + typescript), `postcss.config.mjs`,
-  `vitest.config.mts` (projects `unit`, `integration`); scripts `typecheck` = `next typegen && tsc --noEmit`,
-  `build` = `next build` + `scripts/build-sw.mjs` + `scripts/build-scripts.mjs` (esbuild → `dist/worker.mjs`,
-  `dist/migrate.mjs`, `dist/admin.mjs`).
-- Pure libs + unit tests (34 passing): `src/lib/money.ts`, `src/lib/dates.ts`.
-- Server: `src/server/env.ts` (zod), `db/` (client, collections + indexes, migrations), `auth/` (argon2id, HMAC
-  session ids, TOTP, Mongo rate limits, cookies, current-user helpers, users service), `http/api.ts` (route wrapper:
-  CSRF origin + double submit, auth levels, zod, one error shape), `push/send.ts`, `health.ts`.
-- API routes: auth setup/login/login-totp/logout/register/password/totp start-enable-disable, invites, settings,
-  onboarding complete, push subscribe/unsubscribe/test, health, ready.
-- `src/proxy.ts`: CSP nonce, CSRF cookie, Origin check, redirect to /login without a session cookie.
-- i18n: `src/i18n/request.ts`, `locale.ts`, `messages/el.json`, `messages/en.json` (key parity checked).
-- Design: `PRODUCT.md` (Impeccable init, answered from the brief), direction contract in
-  `.impeccable/surfaces/src-app-app-layout-tsx.md` (D-022), tokens in `src/app/globals.css`, components in
-  `src/components/` (ui, shell, brand, auth, settings, push, pwa, data/month-line).
-- Pages: setup wizard, login, 2FA, invite, onboarding (notification step only), dashboard (empty month), settings,
-  offline; manifest, icons route, service worker template `src/pwa/sw.template.js`.
-- Worker skeleton (`src/worker/`: clock, heartbeat, scheduler, empty job list) and CLIs (`src/cli/migrate.ts`,
-  `src/cli/admin.ts`).
+Verified on 2026-10-22 (local machine, arm64):
+- `npm run lint` clean; `npm run typecheck` clean; `npx vitest run`: 53 tests passing (unit: money, dates;
+  integration on a real Mongo: setup race and closed registration, CSRF, login rate limit, TOTP with replay block,
+  invites, user A/B isolation, password change, logout, migrations idempotent, readiness, backup alerts with a fake
+  clock).
+- `npm run build` green; `npm run screenshots`: tour over a fresh DB with 24 captures (375/1440 px, light/dark),
+  axe-core 0 violations, tabular figures asserted, PWA manifest + active service worker asserted.
+- `docker compose down -v && docker compose up -d --build`: app, worker, mongo and backup **healthy**, migrate exited 0,
+  mongo has no published port, app on `127.0.0.1:3000`, `/api/ready` ready, app and worker run as uid 1000.
+  Image size 99 MB compressed / 429 MB on disk (D-033).
+- `npm run test:backup` (scripts/test-backup.sh): retention, backup-now, restore with identical counts, restore-test,
+  exit-78 config validation, failed run recorded — all PASS. R2 not verified (no credentials, B-004).
+- actionlint 1.7.12 clean; `npm audit --audit-level=critical` passes (5 high in dev-only lint chain, D-035);
+  Trivy 0.76.1 CRITICAL gate passes on both images (gosu removed from the backup image, D-034);
+  `impeccable detect` 0 findings; design review record `docs/design-reviews/phase-1.md` (18/20).
+- Design: `PRODUCT.md`, `DESIGN.md`, `.impeccable/design.json`, direction contract in `.impeccable/surfaces/`.
+  `react-best-practices` copied to `.claude/skills/` from vercel-labs/agent-skills @ `063bee94` (D-016).
 
-Next in Phase 1 (in order):
-1. Lint + `next build` green; run the app against a local Mongo (Docker) and fix runtime issues.
-2. Integration tests (Mongo): setup closes registration, login/TOTP/rate limit, CSRF, user A cannot read user B,
-   migrations idempotent.
-3. Dockerfile (multi-stage, standalone, non-root, HEALTHCHECK), `.dockerignore`, `docker-compose.yml` (app on
-   127.0.0.1, mongo unpublished, migrate one-shot, worker, backup), `docker/mongo-init/`.
-4. Backup image and scripts per PLAN §10 (+ new env vars in `.env.example` and `.env`); verify backup, retention,
-   restore-test locally.
-5. CI workflow + Dependabot per PLAN §11 (SHAs from `docs/research/github-ci-limits.md` §6); run each job's commands locally.
-6. Playwright config, screenshots 375/1440 light/dark of setup, login, onboarding, dashboard, settings; Impeccable
-   critique/audit/polish (degraded in-thread reviewer), then `DESIGN.md` via `/impeccable document`.
-7. Verify Commissioner tabular figures in the browser.
-8. Onboarding steps for income sources, categories and accounts come in Phase 2 (they need the Phase 2 CRUD).
+Carried to Phase 2 by plan: onboarding steps for income sources, categories and accounts (they need the Phase 2
+CRUD); the quick-add sheet and the central Add button; the remaining navigation destinations; the offline expense
+queue (the service worker already replays a queue from IndexedDB).
+
+Next: Phase 2 (Core) — income/expense/accounts/categories CRUD with Greek seed categories, recurring generation
+(idempotent), subscriptions, calendar (month grid + mobile agenda as a vertical month line), quick-add + offline queue,
+onboarding data steps, CI e2e smoke job (Playwright against `docker compose`).
 
 ## Open issues
 

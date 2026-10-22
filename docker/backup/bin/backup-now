@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Pre-deploy backup: waits for the lock, never prunes, exits non-zero on failure so deploy.sh stops.
+exec /usr/local/bin/backup --trigger pre-deploy --no-prune

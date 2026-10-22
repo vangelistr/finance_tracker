@@ -1,0 +1,8 @@
+# gitleaks configuration: the default rules plus narrowly scoped allowlists. Each entry needs a reason.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Public OpenPGP fingerprint of the restic release signing key (restic installation docs), not a secret"
+regexTarget = "match"
+regexes = ['''CF8F18F2844575973F79D4E191A6868BD3F7A907''']

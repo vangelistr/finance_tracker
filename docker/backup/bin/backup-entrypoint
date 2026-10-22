@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Validates the configuration (exit 78 on errors), then runs the daily schedule in Europe/Athens.
+# Catch-up scheduling: a backup is due once now is past the scheduled local time and none ran today, so a DST night
+# that skips 03:00-04:00 or container downtime never loses a day, and the clock going back never runs two.
+# After each scheduled backup: retention; on the first night of a month also `check-repo` and `restore-test`.
+source /usr/local/lib/backup/common.sh
+
+if [ $# -gt 0 ]; then exec "$@"; fi
+
+validate_config
+(ensure_repo) || exit 1
+date +%s >"$STATE_DIR/started-at"
+[[ "$BACKUP_SCHEDULE" =~ ^([0-9]{1,2})\ ([0-9]{1,2}) ]]
+due_minutes=$((10#${BASH_REMATCH[2]} * 60 + 10#${BASH_REMATCH[1]}))
+log info "backup scheduler started" --arg schedule "$BACKUP_SCHEDULE" --arg target "$BACKUP_TARGET"
+
+stop=false
+trap 'stop=true' TERM INT
+while [ "$stop" = false ]; do
+  today=$(date +%F)
+  month=$(date +%Y-%m)
+  now_minutes=$((10#$(date +%H) * 60 + 10#$(date +%M)))
+  if [ "$now_minutes" -ge "$due_minutes" ] && [ "$(state_get last_scheduled_date)" != "$today" ]; then
+    (
+      exec 9>"$LOCK_FILE"
+      flock -w 600 9 || exit 11
+      export BACKUP_LOCK_HELD=1
+      if /usr/local/bin/backup --trigger schedule; then
+        if [ "$(state_get last_check_month)" != "$month" ]; then
+          /usr/local/bin/check-repo schedule && state_set last_check_month "$month"
+        fi
+        if [ "$(state_get last_restore_test_month)" != "$month" ]; then
+          /usr/local/bin/restore-test schedule && state_set last_restore_test_month "$month"
+        fi
+      fi
+    ) || true
+    state_set last_scheduled_date "$today"
+  fi
+  sleep 30 &
+  wait $! || true
+done
+log info "backup scheduler stopped"

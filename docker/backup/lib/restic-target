@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Executes restic against the configured target. A separate executable so `timeout` can wrap it.
+source /usr/local/lib/backup/common.sh
+opts=()
+case "$BACKUP_TARGET" in
+  s3)
+    export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" AWS_DEFAULT_REGION="$R2_REGION"
+    opts+=(-o s3.bucket-lookup=path -o "s3.region=$R2_REGION")
+    ;;
+  sftp)
+    opts+=(-o "sftp.args=-i $SFTP_KEY_FILE -o UserKnownHostsFile=$SFTP_KNOWN_HOSTS_FILE -o StrictHostKeyChecking=yes -o BatchMode=yes")
+    ;;
+esac
+RESTIC_REPOSITORY="$(restic_repository)" exec restic "${opts[@]}" "$@"

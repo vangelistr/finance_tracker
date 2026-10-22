@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Container health: the last successful backup is younger than BACKUP_STALE_HOURS. Before the first backup the
+# container is healthy for BACKUP_STALE_HOURS after start.
+source /usr/local/lib/backup/common.sh
+now=$(date +%s)
+limit=$((BACKUP_STALE_HOURS * 3600))
+if [ -f "$STATE_DIR/last-success.json" ]; then
+  at=$(date -d "$(jq -r .at "$STATE_DIR/last-success.json")" +%s)
+  [ $((now - at)) -lt "$limit" ]
+else
+  started=$(cat "$STATE_DIR/started-at" 2>/dev/null || echo "$now")
+  [ $((now - started)) -lt "$limit" ]
+fi

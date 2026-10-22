@@ -1,0 +1,2 @@
+# Accepted Trivy findings, one CVE ID per line with a reason and an expiry, e.g.:
+# CVE-0000-00000 exp:2027-01-01  reason: not reachable in this image (component not used)

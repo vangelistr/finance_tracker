@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# Restores the latest snapshot into a temporary mongod inside this container (never the live database) and
+# compares per-collection document counts with the counts recorded when the snapshot was taken.
+source /usr/local/lib/backup/common.sh
+
+if [ "${BACKUP_LOCK_HELD:-}" != 1 ]; then
+  exec 9>"$LOCK_FILE"
+  flock -w 600 9 || die "another backup job holds the lock" 11
+fi
+
+run_id=$(runs start RUN_KIND=restore-test RUN_TRIGGER="${1:-manual}" RUN_OFFSITE="$(offsite)") || die "cannot reach MongoDB"
+tmp=$(mktemp -d /tmp/restore-test.XXXXXX)
+port=27018
+cleanup() {
+  mongosh --quiet --norc --port "$port" --eval 'db.getSiblingDB("admin").shutdownServer()' >/dev/null 2>&1 || true
+  rm -rf "$tmp"
+}
+trap cleanup EXIT
+
+fail() {
+  runs finish RUN_ID="$run_id" RUN_STATUS=failed RUN_ERROR="$1" >/dev/null || true
+  jq -n --arg error "$1" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{kind: "restore-test", status: "failed", error: $error, at: $at}' \
+    >"$STATE_DIR/last-restore-test.json"
+  die "restore test failed: $1"
+}
+
+snapshot=$(r snapshots --host "$BACKUP_HOST" --tag mongodb --json | jq -r 'max_by(.time) | .id // empty') || fail "cannot list snapshots"
+[ -n "$snapshot" ] || fail "no snapshot to test"
+recorded=$(runs snapshot-counts RUN_SNAPSHOT="$snapshot")
+[ "$recorded" != null ] || fail "no recorded counts for snapshot ${snapshot:0:8}"
+
+# The scratch mongod lives on the container's small tmpfs: lower the free-space guard for index builds (default 500 MB).
+mongod --dbpath "$tmp" --port "$port" --bind_ip 127.0.0.1 --noauth --wiredTigerCacheSizeGB 0.25 \
+  --setParameter indexBuildMinAvailableDiskSpaceMB=32 \
+  --fork --logpath "$tmp/mongod.log" >/dev/null || fail "temporary mongod did not start"
+
+r dump --host "$BACKUP_HOST" "$snapshot" /finance.archive |
+  mongorestore --host 127.0.0.1 --port "$port" --archive --nsFrom "$MONGO_DB.*" --nsTo 'restore_test.*' --stopOnError --quiet ||
+  fail "mongorestore failed"
+
+restored=$(mongosh --quiet --norc --port "$port" --eval '
+  const d = db.getSiblingDB("restore_test"); const out = {};
+  for (const n of d.getCollectionNames()) if (!n.startsWith("system.")) out[n] = d.getCollection(n).countDocuments({});
+  print(JSON.stringify(out));') || fail "cannot count restored documents"
+
+# Every recorded collection must exist, and its count must lie between the counts before and after the dump.
+report=$(jq -n --argjson rec "$recorded" --argjson got "$restored" '
+  [ ($rec.before | keys[]) as $c
+    | ($rec.before[$c]) as $b | (($rec.after // $rec.before)[$c] // $b) as $a | ($got[$c] // -1) as $g
+    | { collection: $c, recorded: [([$a, $b] | min), ([$a, $b] | max)], restored: $g,
+        ok: ($g >= ([$a, $b] | min) and $g <= ([$a, $b] | max)) } ]')
+bad=$(jq '[.[] | select(.ok | not)] | length' <<<"$report")
+log info "restore test compared collections" --argjson collections "$report"
+[ "$bad" -eq 0 ] || fail "$bad collection(s) differ from the recorded counts"
+
+runs finish RUN_ID="$run_id" RUN_STATUS=success RUN_SNAPSHOT="$snapshot" RUN_COUNTS_AFTER="$restored" >/dev/null
+jq -n --arg snapshot "$snapshot" --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --argjson collections "$report" \
+  '{kind: "restore-test", status: "success", snapshot: $snapshot, at: $at, collections: $collections}' >"$STATE_DIR/last-restore-test.json"
+log info "restore test passed" --arg snapshot "${snapshot:0:8}" --argjson collections "$(jq length <<<"$report")"

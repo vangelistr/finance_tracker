@@ -19,7 +19,6 @@ node_modules/
 .impeccable/questions/
 .impeccable/review/
 .impeccable/mocks/
-.impeccable/
 
 # Build and test output
 tsconfig.tsbuildinfo
@@ -29,3 +28,5 @@ coverage/
 playwright-report/
 test-results/
 public/sw.js
+.playwright-browsers/
+artifacts/

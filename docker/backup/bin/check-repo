@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Full integrity check of the repository (reads every pack; the repository is small).
+source /usr/local/lib/backup/common.sh
+if [ "${BACKUP_LOCK_HELD:-}" != 1 ]; then
+  exec 9>"$LOCK_FILE"
+  flock -w 600 9 || die "another backup job holds the lock" 11
+fi
+run_id=$(runs start RUN_KIND=check RUN_TRIGGER="${1:-manual}" RUN_OFFSITE="$(offsite)") || die "cannot reach MongoDB"
+if r check --read-data >/dev/null; then
+  runs finish RUN_ID="$run_id" RUN_STATUS=success >/dev/null
+  log info "repository check passed"
+else
+  runs finish RUN_ID="$run_id" RUN_STATUS=failed RUN_ERROR="restic check reported errors" >/dev/null
+  die "repository check failed"
+fi

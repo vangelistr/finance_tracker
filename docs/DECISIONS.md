@@ -146,3 +146,82 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
   parts; Trivy actions were compromised in March 2026, advisory GHSA-69fq-xp46-6x23). Trivy ≥ 0.72 (0.76.1 pinned).
 - Provenance: BuildKit `provenance: mode=max` + `sbom: true` on pushed images; GitHub artifact attestations need
   Enterprise Cloud for private repos (B-007).
+
+## Phase 1 (2026-10-22)
+
+### D-022 Design direction: Athens Metro wayfinding (Impeccable, code-led)
+- **Process:** `/impeccable init` wrote `PRODUCT.md` from the brief (hands-off: the interview was answered from the
+  brief, every fact sourced to it). `impeccable concept-seed --scope direction --mode operate` ran once through the
+  network (one GET to the impeccable.style roll API carrying scope, mode and a seed key only; no project data) and
+  assigned candidate 4 of seven grounded directions. The decision page was not served because the brief forbids
+  waiting for the owner; the roll was judged in-thread and every challenger got a verdict.
+- **Grounded list (by resonance):** 1 Greek tax and EFKA forms (numbered field codes), 2 bank passbook,
+  3 banknote security print, **4 Athens Metro wayfinding (assigned, built)**, 5 Aegean nautical chart,
+  6 freelancer receipt pad, 7 KTEL/OSE timetable.
+- **Direction:** the month is a metro line; each dated item is a station, hollow while expected, filled when
+  received or paid. Navy shell rail, cool tile ground, line colours for data (green income, red spending,
+  blue action, ochre goals, violet tax reserve), Commissioner variable, tabular figures, one-pixel rules.
+- **Challengers (all declined, each donated one discipline):** boarding pass and gate board (changed state holds
+  until acknowledged), dark-first console (destructive actions isolated), centre-rail reference setting
+  (one-device-pixel rules, states as marks), variable-font specimen (hierarchy from one face's size and weight),
+  zoo guide map (flat colour owning whole regions). Convention catalog: no transferable discipline beyond the above.
+- **Recorded in:** `.impeccable/surfaces/src-app-app-layout-tsx.md` (direction contract, seed reference).
+- **Why not the pick (tax forms):** the brief asks for calm and trustworthy; form-paper bureaucracy risks
+  reading as the tax office on every screen. Its "show the working" discipline is kept through visible formulas.
+- **Subagents:** Impeccable's finish reviewer and documenter subagents are not spawned (project rule: subagents only
+  for Phase 0 research). Their degraded in-thread procedures are used instead.
+
+### D-029 `use-intl` 4.14.9 as a direct dependency
+- `use-intl/core` provides `createTranslator` without React, for push texts built in the worker and route handlers.
+  It is already installed as `next-intl`'s own dependency; pinning it directly makes the import explicit.
+
+### D-030 Dependencies added in Phase 1 (one line each)
+- `@fontsource-variable/source-sans-3` 5.3.1: self-hosted variable UI font with Greek and tabular figures (D-032).
+- `lucide-react` 1.61.0: one icon family, one stroke width.
+- `qrcode` 1.5.4: TOTP enrolment QR code rendered on the server as a data URL.
+- `server-only` 0.0.1: build-time guard that server modules never reach a client bundle.
+- `@axe-core/playwright` 4.14.0: accessibility checks in the e2e and screenshot runs.
+
+### D-031 Next.js telemetry disabled through the environment
+- Next.js sends anonymous usage telemetry unless disabled, and it was enabled on the build machine. The brief allows
+  no telemetry. Every npm script, the Dockerfile and CI set `NEXT_TELEMETRY_DISABLED=1` (plus `DO_NOT_TRACK=1`).
+  The machine-wide setting (`next telemetry disable`) is not changed because it lives outside the project.
+- The first local `next build`, `next typegen` and `next dev` runs of Phase 1 (2026-10-22) ran before this fix and
+  may have sent anonymous Next.js usage events (no project code or data). Logged as B-008.
+- `agentRules: false` stops `next dev` from writing an `AGENTS.md` into the repository.
+
+### D-032 Font: Source Sans 3 instead of Commissioner
+- **Why:** The brief requires tabular numerals for money. A browser measurement on 2026-10-22 showed Commissioner
+  (fontsource build) has no `tnum` feature: ten 1s measured 171 px and ten 0s 261 px at 40 px with `tnum` on.
+  Source Sans 3, Manrope, Noto Sans, Roboto Flex and Geologica all passed (equal widths) and all ship Greek.
+- **Choice:** Source Sans 3: a proven UI workhorse, narrow enough for long Greek labels, with a Greek extension.
+  The screenshot tour now asserts equal digit widths, so a font change cannot silently break it again.
+
+### D-033 Docker image and Compose hardening
+- App image: `node:24.22.1-trixie-slim` pinned by digest, multi-stage, Next.js standalone + esbuild bundles, runs as
+  `node` (uid 1000), `HEALTHCHECK` on `/api/health`. Size (local arm64 build, 2026-10-22): **99 MB compressed,
+  429 MB on disk**. CI prints the amd64 size on every run.
+- Compose: MongoDB only on an `internal: true` network (no route out, no published port); app and worker also on an
+  `edge` network for push/market/FX egress; app published on `127.0.0.1` only; one-shot `migrate` service gates app
+  and worker; read-only root filesystems, `cap_drop: [ALL]`, `no-new-privileges`, memory limits.
+
+### D-034 Backup implementation details (local verification 2026-10-22)
+- Restore resolves `latest` to a snapshot ID before its safety backup (otherwise it would restore the safety
+  snapshot) and keeps `backup_runs` untouched (`--nsExclude`), so the run history survives a restore.
+- The restore test's scratch `mongod` lowers `indexBuildMinAvailableDiskSpaceMB` to 32 because it runs on the
+  container's 512 MB tmpfs (MongoDB refuses index builds below 500 MB free by default).
+- restic 0.19 keeps the oldest snapshot while the history is shorter than the policy, so one day of backups settles at
+  two snapshots; the retention check expects at most two.
+- `gosu` is deleted from the backup image: it is only used by the mongo server entrypoint, and Trivy 0.76.1 reported a
+  critical Go stdlib CVE (CVE-2025-68121, crypto/tls) in it. The `mongo` service itself keeps the official image;
+  gosu there only drops privileges at start and does no TLS. Dependabot proposes the next mongo patch tag.
+
+### D-035 CI specifics
+- `ci.yml` runs on pull requests and pushes to `build/**`; `release.yml` runs on `main` and `v*` tags and calls
+  `ci.yml` (`workflow_call`), so `main` is never tested twice. A `changes` job (plain `git diff`, no third-party
+  action) skips heavy jobs for docs-only changes; `ci-success` aggregates. gitleaks 8.30.1, Trivy 0.76.1 and
+  actionlint 1.7.12 run as SHA-256-pinned release binaries. The image job also smoke-tests the container as non-root.
+- `npm audit --audit-level=critical` passes. It reports 5 **high** findings, all in the dev-only lint chain
+  (`eslint-config-next` → `@next/eslint-plugin-next` → `fast-glob` → `micromatch` → `braces`); the suggested fix
+  downgrades `eslint-config-next` to 14.x, which would break linting on Next 16. Left to Dependabot; not shipped in
+  the image.
