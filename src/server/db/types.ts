@@ -112,7 +112,7 @@ export interface NotificationLogDoc {
   userId: ObjectId;
   key: string;
   type: string;
-  status: 'sending' | 'sent' | 'failed' | 'no_subscription';
+  status: 'sending' | 'sent' | 'failed' | 'no_subscription' | 'superseded';
   createdAt: Date;
   updatedAt: Date;
 }

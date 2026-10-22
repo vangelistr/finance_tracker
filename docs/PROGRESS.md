@@ -1,9 +1,9 @@
 # Progress
 
 Last updated: 2026-10-22
-Status: **Phases 0–3 done. Next: Phase 4 (Notification worker).**
+Status: **Phases 0–4 done. Next: Phase 5 (Savings goals + Smart Plan).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 3: dashboard, charts, budgets" commit on `build/finance-tracker`; Phase 2 (`71ca02c`) CI green
+Last verified commit: the "Phase 4: notification worker" commit on `build/finance-tracker`; Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
 including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 (after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
 
@@ -15,7 +15,7 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 1 Foundation | done | "Phase 1: foundation" (see `git log`) |
 | 2 Core | done | "Phase 2: core" (see `git log`) |
 | 3 Dashboard, charts, budgets | done | "Phase 3: dashboard, charts, budgets" (see `git log`) |
-| 4 Notification worker | not started | — |
+| 4 Notification worker | done | "Phase 4: notification worker" (see `git log`) |
 | 5 Savings goals + Smart Plan | not started | — |
 | 6 Investing module | not started | — |
 | 7 Month-end report + tax/EFKA | not started | — |
@@ -80,6 +80,17 @@ Next: Phase 4 — worker jobs with a fake clock: daily reminder (default 21:00),
 last month's report placeholder link, pre-filled income form listing expected recurring incomes, investing link when
 enabled), renewal alerts N days before (per subscription), overspend alerts per category and overall at thresholds
 (once per threshold per period), in-app notification banner, push per-type toggles (exist), iOS note (exists).
+
+## Phase 4 summary (Notification worker)
+
+Verified on 2026-10-22: 97 tests, including fake-clock worker tests: daily reminder at 21:00 Europe/Athens once a day
+(also on the 25 Oct DST day), custom time and off switch; 1st-of-month flow once at 09:00; renewal alerts N days before,
+once per renewal, paused subscriptions quiet; overspend once per threshold per budget per month, highest-only on a jump,
+overall budget; in-app notifications API isolation. Tour 64 captures, axe 0. Design review `docs/design-reviews/phase-4.md`.
+
+Next: Phase 5 — savings goals (target, deadline, linked account, priority, contributions manual or from the plan,
+progress, required monthly, projected date) and the Smart Plan per `docs/allocation-methodology.md` §3 (pure functions,
+property test, formula and inputs shown, overrides, disclaimer).
 
 ## Open issues
 

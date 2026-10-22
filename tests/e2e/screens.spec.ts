@@ -1,5 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
+import { MongoClient } from 'mongodb';
 import { a11yIssues, captureAll, OWNER } from './helpers';
 
 // Screenshot and accessibility tour over a fresh database (run with `npm run screenshots`). Steps depend on each other.
@@ -15,6 +16,7 @@ async function quickAdd(page: Page, amount: string, category: string) {
 }
 
 test('first run, onboarding, every main screen, offline queue', async ({ page, context }) => {
+  test.setTimeout(300_000);
   await page.goto('/');
   await expect(page).toHaveURL(/\/setup$/);
   await captureAll(page, 'setup');
@@ -65,6 +67,14 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   await page.getByRole('button', { name: 'Αποθήκευση' }).click();
   await expect(page.getByText('Αποθηκεύτηκε')).toBeVisible();
 
+  // An in-app notification, as the worker would leave it, so the banner is part of the tour.
+  if (process.env.MONGO_URL) {
+    const client = await MongoClient.connect(process.env.MONGO_URL);
+    const db = client.db();
+    const owner = await db.collection('users').findOne({ role: 'owner' });
+    await db.collection('notifications').insertOne({ userId: owner!._id, type: 'renewal', titleKey: 'renewalTitle', bodyKey: 'renewalBody', params: { name: 'Netflix', amount: '13,99 €', date: '25 Οκτωβρίου' }, url: '/fixed', createdAt: new Date(), readAt: null });
+    await client.close();
+  }
   await page.goto('/');
   await captureAll(page, 'dashboard');
 
@@ -87,6 +97,7 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   for (const [path, name] of [
     ['/transactions', 'transactions'],
     ['/budgets', 'budgets'],
+    ['/monthly', 'monthly'],
     ['/income', 'income'],
     ['/fixed', 'fixed'],
     ['/accounts', 'accounts'],

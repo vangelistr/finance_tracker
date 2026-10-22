@@ -284,3 +284,20 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 - Budgets are set per top-level expense category (subcategory spending rolls up) and overall; a zero amount removes a
   budget. Progress uses month-to-date completed spending and the user's thresholds (80 % and 100 % by default), which the
   Phase 4 overspend alerts reuse.
+
+## Phase 4 (2026-10-22)
+
+### D-044 Notification timing, catch-up and de-duplication
+- Each job runs every worker tick (30 s) per user in the user's time zone and sends through the insert-before-send log
+  (D-020), so repeated ticks, restarts and two workers cannot duplicate a message.
+- Daily reminder: from the configured time (default 21:00) for 2 hours, key `daily:<localDate>`.
+- 1st-of-month flow: on the 1st from the configured time (default 09:00) for 14 hours, key `monthly:<YYYY-MM>`; it opens
+  `/monthly` (last month at a glance, this month's expected income to confirm, record irregular pay, report link, and
+  the investing suggestion link when that module is on).
+- Renewals: from 09:00 local on the day N days before the renewal (per subscription, default from settings) until the
+  renewal day, key `renewal:<subscriptionId>:<renewalDate>`; paused or cancelled subscriptions stay quiet.
+- Overspend: when month-to-date spending crosses a threshold of a budget, key
+  `overspend:<categoryId|overall>:<YYYY-MM>:<threshold>`; if several thresholds are crossed at once only the highest is
+  sent and the lower ones are logged as `superseded`, so they never arrive late.
+- Every notification is also stored in-app; the shell shows unread ones from the last 14 days as a banner (the
+  fallback when push is off, unsupported, or iOS outside the Home Screen).

@@ -273,7 +273,20 @@
     "backupFailedTitle": "Backup failed",
     "backupFailedBody": "The “{kind}” job failed. See Settings → Backups.",
     "backupStaleTitle": "No recent backup",
-    "backupStaleBody": "No successful backup in the last {hours} hours."
+    "backupStaleBody": "No successful backup in the last {hours} hours.",
+    "dailyTitle": "Today’s spending",
+    "dailyBody": "A minute to log what you spent today.",
+    "monthlyTitle": "A new month",
+    "monthlyBody": "See how last month went and confirm this month’s income.",
+    "monthlyBodyInvesting": "See how last month went, confirm this month’s income and see the monthly investing suggestion.",
+    "renewalTitle": "Renewal: {name}",
+    "renewalBody": "{amount} on {date}.",
+    "overspendTitle": "Budget: {category}",
+    "overspendTitleOver": "Over budget: {category}",
+    "overspendBody": "You spent {spent} of {budget} ({threshold} %).",
+    "dismiss": "Dismiss",
+    "open": "Open",
+    "unread": "{count, plural, one {# new notification} other {# new notifications}}"
   },
   "status": {
     "expected": "Expected",
@@ -444,5 +457,15 @@
     "saved": "Saved",
     "noBudget": "No limit",
     "spentThisMonth": "Spent this month: {amount}"
+  },
+  "monthly": {
+    "title": "Month start",
+    "lastMonth": "{month}: how it went",
+    "report": "Monthly report",
+    "income": "This month’s income",
+    "incomeHint": "Confirm what arrived and add irregular pay.",
+    "noExpected": "No expected income this month.",
+    "investing": "Monthly investing suggestion",
+    "saved": "Saved"
   }
 }
