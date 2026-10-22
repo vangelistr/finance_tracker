@@ -1,9 +1,10 @@
 # Progress
 
 Last updated: 2026-10-22
-Status: **Phases 0–2 done. Next: Phase 3 (Dashboard, charts, budgets).**
+Status: **Phases 0–3 done. Next: Phase 4 (Notification worker).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 2: core" commit on `build/finance-tracker`. CI on GitHub was green for Phase 1 at `c0aed5b`
+Last verified commit: the "Phase 3: dashboard, charts, budgets" commit on `build/finance-tracker`; Phase 2 (`71ca02c`) CI green
+including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 (after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
 
 ## Phases
@@ -13,7 +14,7 @@ Last verified commit: the "Phase 2: core" commit on `build/finance-tracker`. CI 
 | 0 Research and plan | done | `6f22361` |
 | 1 Foundation | done | "Phase 1: foundation" (see `git log`) |
 | 2 Core | done | "Phase 2: core" (see `git log`) |
-| 3 Dashboard, charts, budgets | not started | — |
+| 3 Dashboard, charts, budgets | done | "Phase 3: dashboard, charts, budgets" (see `git log`) |
 | 4 Notification worker | not started | — |
 | 5 Savings goals + Smart Plan | not started | — |
 | 6 Investing module | not started | — |
@@ -68,6 +69,17 @@ captures + quick-add, axe 0 violations, offline queue syncs once, PWA checks); `
 Next: Phase 3 — budgets (per category and overall, monthly), dashboard charts as server-rendered SVG (donut expenses
 by category and income by source, bars income vs expenses per month, line net worth, budget progress bars) with a
 date-range filter and fixture tests that assert every chart's totals.
+
+## Phase 3 summary (Dashboard, charts, budgets)
+
+Verified on 2026-10-22: 91 tests (aggregates on a hand-computed fixture for every chart, chart markup totals, budgets
+API and isolation); lint, typecheck clean; tour with budgets and charts (56 captures, axe 0); detector 0.
+Design review: `docs/design-reviews/phase-3.md`.
+
+Next: Phase 4 — worker jobs with a fake clock: daily reminder (default 21:00), monthly flow on the 1st (09:00; ensure
+last month's report placeholder link, pre-filled income form listing expected recurring incomes, investing link when
+enabled), renewal alerts N days before (per subscription), overspend alerts per category and overall at thresholds
+(once per threshold per period), in-app notification banner, push per-type toggles (exist), iOS note (exists).
 
 ## Open issues
 

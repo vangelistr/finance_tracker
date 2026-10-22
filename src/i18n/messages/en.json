@@ -165,7 +165,30 @@
     "comingUp": "Coming up",
     "recent": "Recent",
     "nothingComing": "Nothing else expected this month.",
-    "nothingRecent": "No completed transactions yet."
+    "nothingRecent": "No completed transactions yet.",
+    "rangeLabel": "Period",
+    "range_month": "This month",
+    "range_3m": "3 months",
+    "range_6m": "6 months",
+    "range_12m": "12 months",
+    "range_ytd": "This year",
+    "spendingByCategory": "Spending by category",
+    "incomeBySource": "Income by source",
+    "inVsOut": "Income and spending by month",
+    "netWorth": "Net worth",
+    "budgets": "This month’s budgets",
+    "total": "Total",
+    "noSpending": "No spending in this period.",
+    "noIncome": "No income in this period.",
+    "noBudgets": "You have not set any budgets.",
+    "setBudgets": "Set budgets",
+    "other": "Other",
+    "overall": "Overall",
+    "month": "Month",
+    "value": "Value",
+    "share": "Share",
+    "in": "In",
+    "out": "Out"
   },
   "settings": {
     "title": "Settings",
@@ -406,5 +429,20 @@
     "legendExpected": "Expected",
     "legendDone": "Done",
     "weekdays": "M,T,W,T,F,S,S"
+  },
+  "budgets": {
+    "title": "Budgets",
+    "intro": "A monthly limit overall and per category. You are alerted at {thresholds} of a limit.",
+    "overall": "Overall monthly budget",
+    "perCategory": "Per category",
+    "spentOf": "{spent} of {budget}",
+    "over": "Over by {amount}",
+    "left": "{amount} left",
+    "warning": "Close to the limit",
+    "overState": "Over the limit",
+    "save": "Save",
+    "saved": "Saved",
+    "noBudget": "No limit",
+    "spentThisMonth": "Spent this month: {amount}"
   }
 }

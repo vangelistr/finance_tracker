@@ -270,3 +270,17 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 ### D-041 CI e2e smoke inside the image job
 - The smoke test runs against `docker compose` started from the images the job just built (no second build), with
   throwaway secrets generated in the job, so no repository secret is needed.
+
+## Phase 3 (2026-10-22)
+
+### D-042 Dashboard charts and ranges
+- Pure aggregations in `src/lib/aggregates.ts` (only completed transactions count; subcategories roll up to their
+  top-level category; donuts fold beyond 7 slices into "Other" without changing the total). Server-rendered SVG with a
+  hidden data table (the tests read the exact numbers back from the markup).
+- Range filter: this month, 3, 6, 12 months, year to date. Donuts follow the range; the monthly bars and the net-worth
+  line show at least six months; net worth starts at the month of the first account (nothing to measure before it).
+
+### D-043 Budgets on top-level categories plus one overall budget
+- Budgets are set per top-level expense category (subcategory spending rolls up) and overall; a zero amount removes a
+  budget. Progress uses month-to-date completed spending and the user's thresholds (80 % and 100 % by default), which the
+  Phase 4 overspend alerts reuse.

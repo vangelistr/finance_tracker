@@ -243,5 +243,14 @@ export interface TransactionDoc {
   updatedAt: Date;
 }
 
+export interface BudgetDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  /** Top-level expense category; null = the overall monthly budget. */
+  categoryId: ObjectId | null;
+  amountMinor: Minor;
+  updatedAt: Date;
+}
+
 // Re-exported so domain documents added in later phases share one import path.
 export type { LocalDate, Minor };

@@ -58,6 +58,13 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   await fixed.getByRole('button', { name: 'Αποθήκευση' }).click();
   await expect(page.getByText('Netflix')).toBeVisible();
 
+  // Budgets: overall and one category, so the dashboard shows progress.
+  await page.goto('/budgets');
+  await page.getByLabel('Συνολικός μηνιαίος προϋπολογισμός').fill('800');
+  await page.getByLabel('Σούπερ μάρκετ').fill('15');
+  await page.getByRole('button', { name: 'Αποθήκευση' }).click();
+  await expect(page.getByText('Αποθηκεύτηκε')).toBeVisible();
+
   await page.goto('/');
   await captureAll(page, 'dashboard');
 
@@ -79,6 +86,7 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
 
   for (const [path, name] of [
     ['/transactions', 'transactions'],
+    ['/budgets', 'budgets'],
     ['/income', 'income'],
     ['/fixed', 'fixed'],
     ['/accounts', 'accounts'],

@@ -25,6 +25,12 @@ export const MIGRATIONS: Migration[] = [
       // default categories when they open onboarding or the categories page (seedCategories is idempotent).
     },
   },
+  {
+    id: '0003-budgets',
+    up: async () => {
+      // Budgets collection (index from ensureIndexes).
+    },
+  },
 ];
 
 export async function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): Promise<string[]> {

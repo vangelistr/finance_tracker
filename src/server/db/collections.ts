@@ -4,6 +4,7 @@ import { getDb } from './client';
 import type {
   AccountDoc,
   AppMetaDoc,
+  BudgetDoc,
   CategoryDoc,
   IncomeSourceDoc,
   RecurringExpenseDoc,
@@ -36,6 +37,7 @@ export function collectionsOf(db: Db) {
     incomeSources: db.collection<IncomeSourceDoc>('income_sources'),
     recurringExpenses: db.collection<RecurringExpenseDoc>('recurring_expenses'),
     transactions: db.collection<TransactionDoc>('transactions'),
+    budgets: db.collection<BudgetDoc>('budgets'),
   };
 }
 
@@ -98,6 +100,7 @@ export const INDEXES: Record<string, IndexDescription[]> = {
       partialFilterExpression: { clientId: { $type: 'string' } },
     },
   ],
+  budgets: [{ key: { userId: 1, categoryId: 1 }, name: 'user_category_unique', unique: true }],
 };
 
 export async function ensureIndexes(db: Db): Promise<void> {

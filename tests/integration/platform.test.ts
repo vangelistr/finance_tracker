@@ -9,7 +9,7 @@ import { writeHeartbeat } from '@/worker/heartbeat';
 describe('migrations', () => {
   it('are idempotent and create every declared index', async () => {
     const db = await getDb();
-    expect(await runMigrations(db)).toEqual(['0001-baseline', '0002-finance-core']);
+    expect(await runMigrations(db)).toEqual(['0001-baseline', '0002-finance-core', '0003-budgets']);
     expect(await runMigrations(db)).toEqual([]);
     for (const [name, specs] of Object.entries(INDEXES)) {
       const existing = (await db.collection(name).indexes()).map((i) => i.name);
