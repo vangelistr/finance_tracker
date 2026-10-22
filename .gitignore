@@ -10,3 +10,22 @@ docs/PROMPT.md
 # Dependencies and build output (Phase 1 extends this list)
 node_modules/
 .next/
+.playwright-mcp/
+
+# Impeccable engine cache (IMPECCABLE_HOME); .impeccable/config.json is committed (telemetry off)
+.impeccable-home/
+.impeccable/config.local.json
+.impeccable/live/
+.impeccable/questions/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/
+
+# Build and test output
+tsconfig.tsbuildinfo
+next-env.d.ts
+dist/
+coverage/
+playwright-report/
+test-results/
+public/sw.js
