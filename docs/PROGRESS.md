@@ -111,6 +111,22 @@ educational labels, monthly suggestion fed by the plan's investing share, daily 
 because no market-data keys exist (B-003); tests that the module makes zero network calls when off and that no
 user-facing string says buy, sell or predicts.
 
+## Where the run stands (user went offline, 2026-10-22)
+
+- Done and pushed: Phases 0-5. Phase 5 is commit `b56be99` on `build/finance-tracker`. Its CI run (id 39838143427) was still
+  in progress when this note was written; the result is not yet confirmed. Check with `gh run view 39838143427`.
+- In progress: Phase 6 (Investing module). Only reading was done: the brief (req. 11), PLAN sections 6.6 and 8,
+  `docs/MARKET-DATA.md`, the existing flag and hooks. **No Phase 6 files exist yet; the working tree is clean.**
+- Existing hooks Phase 6 plugs into: `settings.investingEnabled` (users, setup wizard, settings ModulesForm),
+  `notifications.marketDigest` (off by default, toggle already in settings), the `investing` nav entry in `PLANNED`
+  (`src/components/shell/nav.ts`, `investingOnly`), the `monthlyBodyInvesting` message, `src/worker/jobs.ts` (add the
+  market refresh and digest jobs), env keys `TWELVEDATA_API_KEY`, `EODHD_API_KEY`, `FMP_API_KEY`, `ALPHAVANTAGE_API_KEY`,
+  `FINNHUB_API_KEY`, `FX_BASE_URL` (all keys are empty, so providers are mocked, B-003).
+- Next step: build `src/lib/investing/` pure functions (metrics, scoring, split with caps; PLAN 6.6) with unit tests, then
+  `src/server/market/` (provider interface, chain, budgets, TTL cache, FX), the `/investing` pages and API (404 when off),
+  the worker refresh and digest jobs, the zero-network-when-off test and the i18n wording test.
+- Open issues: none new.
+
 ## Open issues
 
 - `npm install` ran on local Node 25 (vitest EBADENGINE warning only); image and CI use Node 24.22.1.
