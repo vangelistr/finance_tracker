@@ -1,5 +1,5 @@
 import type { ObjectId } from 'mongodb';
-import type { AccountDoc, CategoryDoc, IncomeSourceDoc, RecurringExpenseDoc, TransactionDoc } from '@/server/db/types';
+import type { AccountDoc, CategoryDoc, GoalDoc, IncomeSourceDoc, RecurringExpenseDoc, TransactionDoc } from '@/server/db/types';
 
 // Plain JSON shapes for the client: ids as hex strings, never userId.
 
@@ -69,6 +69,16 @@ export const transactionDto = (t: TransactionDoc) => ({
   note: t.note,
   origin: t.origin,
   generated: !!t.occurrenceKey,
+});
+
+export const goalDto = (g: GoalDoc) => ({
+  id: g._id.toHexString(),
+  name: g.name,
+  targetMinor: g.targetMinor,
+  deadline: g.deadline,
+  accountId: g.accountId?.toHexString() ?? null,
+  priority: g.priority,
+  isEmergencyFund: g.isEmergencyFund,
 });
 
 export type AccountDto = ReturnType<typeof accountDto>;

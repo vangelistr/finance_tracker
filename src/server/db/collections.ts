@@ -5,6 +5,8 @@ import type {
   AccountDoc,
   AppMetaDoc,
   BudgetDoc,
+  GoalContributionDoc,
+  GoalDoc,
   CategoryDoc,
   IncomeSourceDoc,
   RecurringExpenseDoc,
@@ -38,6 +40,8 @@ export function collectionsOf(db: Db) {
     recurringExpenses: db.collection<RecurringExpenseDoc>('recurring_expenses'),
     transactions: db.collection<TransactionDoc>('transactions'),
     budgets: db.collection<BudgetDoc>('budgets'),
+    goals: db.collection<GoalDoc>('goals'),
+    goalContributions: db.collection<GoalContributionDoc>('goal_contributions'),
   };
 }
 
@@ -101,6 +105,16 @@ export const INDEXES: Record<string, IndexDescription[]> = {
     },
   ],
   budgets: [{ key: { userId: 1, categoryId: 1 }, name: 'user_category_unique', unique: true }],
+  goals: [{ key: { userId: 1, archived: 1, priority: 1 }, name: 'user_list' }],
+  goal_contributions: [
+    { key: { userId: 1, goalId: 1, localDate: 1 }, name: 'user_goal_date' },
+    {
+      key: { userId: 1, goalId: 1, planMonth: 1 },
+      name: 'user_goal_plan_unique',
+      unique: true,
+      partialFilterExpression: { planMonth: { $type: 'string' } },
+    },
+  ],
 };
 
 export async function ensureIndexes(db: Db): Promise<void> {

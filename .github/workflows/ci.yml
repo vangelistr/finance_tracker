@@ -221,10 +221,18 @@ jobs:
           curl -sf http://127.0.0.1:3000/api/ready
           docker compose ps
           test -z "$(docker port finance-mongo-1)"
-      - name: Playwright browser
+      - name: Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browser
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ github.workspace }}/.playwright-browsers
+          key: playwright-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - name: Playwright browser (headless shell; the runner image already has Chrome's system libraries)
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.playwright-browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --only-shell chromium
       - name: e2e smoke (Playwright against docker compose)
         env:
           PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.playwright-browsers

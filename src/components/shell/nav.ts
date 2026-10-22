@@ -29,6 +29,8 @@ export const NAV: NavItem[] = [
   { key: 'transactions', href: '/transactions', icon: ListOrdered },
   { key: 'calendar', href: '/calendar', icon: CalendarDays },
   { key: 'budgets', href: '/budgets', icon: Gauge },
+  { key: 'goals', href: '/goals', icon: PiggyBank },
+  { key: 'plan', href: '/plan', icon: BarChart3 },
   { key: 'income', href: '/income', icon: Wallet },
   { key: 'fixed', href: '/fixed', icon: Repeat },
   { key: 'accounts', href: '/accounts', icon: Landmark },
@@ -38,8 +40,6 @@ export const NAV: NavItem[] = [
 
 // Planned destinations, listed so the shell layout is designed for its final size.
 export const PLANNED: NavItem[] = [
-  { key: 'goals', href: '/goals', icon: PiggyBank },
-  { key: 'plan', href: '/plan', icon: BarChart3 },
   { key: 'reports', href: '/reports', icon: FileText },
   { key: 'tax', href: '/tax', icon: Receipt },
   { key: 'investing', href: '/investing', icon: LineChart, investingOnly: true },

@@ -2,6 +2,7 @@ import type { ObjectId } from 'mongodb';
 import type { LocalDate } from '@/lib/dates';
 import type { Minor } from '@/lib/money';
 import type { Schedule } from '@/lib/recurrence';
+import type { PlanSettings } from '@/lib/plan';
 
 export type Locale = 'el' | 'en';
 export type Theme = 'system' | 'light' | 'dark';
@@ -20,6 +21,8 @@ export interface UserSettings {
   investingEnabled: boolean;
   theme: Theme;
   notifications: NotificationSettings;
+  /** Smart Plan overrides; missing keys use DEFAULT_PLAN_SETTINGS. */
+  plan?: Partial<PlanSettings>;
 }
 
 export interface UserDoc {
@@ -250,6 +253,36 @@ export interface BudgetDoc {
   categoryId: ObjectId | null;
   amountMinor: Minor;
   updatedAt: Date;
+}
+
+export interface GoalDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  name: string;
+  targetMinor: Minor;
+  deadline: LocalDate | null;
+  accountId: ObjectId | null;
+  /** 1 = highest. */
+  priority: number;
+  isEmergencyFund: boolean;
+  archived: boolean;
+  seq: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface GoalContributionDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  goalId: ObjectId;
+  amountMinor: Minor;
+  localDate: LocalDate;
+  month: string;
+  source: 'manual' | 'plan';
+  /** Set for contributions applied from the Smart Plan: one per goal per month. */
+  planMonth: string | null;
+  note: string;
+  createdAt: Date;
 }
 
 // Re-exported so domain documents added in later phases share one import path.

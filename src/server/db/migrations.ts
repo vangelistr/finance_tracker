@@ -31,6 +31,12 @@ export const MIGRATIONS: Migration[] = [
       // Budgets collection (index from ensureIndexes).
     },
   },
+  {
+    id: '0004-goals',
+    up: async () => {
+      // Goals and contributions (indexes from ensureIndexes).
+    },
+  },
 ];
 
 export async function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): Promise<string[]> {

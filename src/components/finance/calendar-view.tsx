@@ -118,7 +118,7 @@ export function CalendarView({ weeks, days, today, currency, categories }: Props
                         <li key={i.key} className="flex items-center gap-2.5">
                           <StatusMark tone={i.kind === 'transfer' ? 'transfer' : i.kind} state={i.state} />
                           <span className="min-w-0 flex-1 truncate">{i.label}</span>
-                          <Money minor={i.kind === 'income' ? i.amountMinor : -i.amountMinor} currency={currency} locale={loc} className={cn('text-sm', i.state === 'done' ? 'font-semibold' : 'text-ink-3')} />
+                          <Money minor={i.kind === 'income' || i.kind === 'goal' ? i.amountMinor : -i.amountMinor} currency={currency} locale={loc} className={cn('text-sm', i.state === 'done' ? 'font-semibold' : 'text-ink-3')} />
                         </li>
                       ))}
                     </ul>

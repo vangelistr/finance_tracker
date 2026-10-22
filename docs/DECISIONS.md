@@ -301,3 +301,47 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
   sent and the lower ones are logged as `superseded`, so they never arrive late.
 - Every notification is also stored in-app; the shell shows unread ones from the last 14 days as a banner (the
   fallback when push is off, unsupported, or iOS outside the Home Screen).
+
+### D-045 CI: Playwright browser cached, no apt step
+- One Phase 3 run spent 721 s in `playwright install --with-deps` (apt on the runner), turning a 4-minute job into 16.
+  The image job now caches the browser folder keyed by the Playwright version and installs only the headless shell
+  without `--with-deps`; the `ubuntu-24.04` image already ships Chrome and its system libraries.
+
+## Phase 5 (2026-10-22)
+
+### D-046 Goal contributions are earmarks, not account transfers
+- A contribution records money set aside for a goal (`goal_contributions`: amount, local date, source `manual` or
+  `plan`). It does not move money between accounts and does not change balances, net worth or spending; a goal's
+  optional linked account is a label for where the money sits. This keeps one source of truth for balances and lets a
+  goal live inside an ordinary savings account.
+- Deleting a contribution is allowed (typo fix); archiving a goal keeps its contributions.
+
+### D-047 Goal progress, required amount and pace
+- Progress = saved / target (capped at 100 % for display). Required monthly = remaining / months from this month to
+  the deadline month (at least 1), rounded up to the cent, so paying it each month reaches the target on time.
+- Pace = contributions of the current and the two previous calendar months / 3. Projected completion = this month plus
+  remaining / pace months; with no pace the UI says "no recent contributions" instead of a date.
+
+### D-048 Smart Plan: applying is idempotent and never feeds back into its own month
+- "Record on the goals" upserts one `plan` contribution per goal per month (`planMonth`); running it again replaces the
+  amounts, and a zero amount removes the row. The plan for a month subtracts that month's own plan contributions
+  before computing, so applying twice gives the same numbers.
+- The plan uses complete months only (methodology 3.1); the current month affects only the surplus block.
+- The surplus tax-reserve step reads 0 until the Phase 7 estimator supplies the amount due.
+
+### D-049 The working is rendered from message templates, not a `Plan.steps` array
+- Methodology section 6 sketches a `steps` array. The view instead renders each block's formula from the message
+  catalogue (Greek and English) and its inputs from the plan result, which already carries every number. A unit test
+  renders the view for every worked example and checks the disclaimer, each formula and the inputs (the section 6 test
+  contract), plus a wording check that nothing outside the disclaimer says buy, sell, predict or names an instrument.
+
+### D-050 Goals on the calendar
+- Recorded contributions show on their dates (filled ochre station). A goal with a deadline also shows its required
+  monthly amount at the end of each month after the current one up to the deadline month (on the deadline day in that
+  month), matching D-047's spread; in the deadline month itself, when it is the current month, the amount still due
+  shows as expected. Reached goals show nothing due.
+
+### D-051 Split colours
+- Essentials use Line Red (money that must be spent), savings Line Ochre (goals), discretionary the neutral slate and
+  investing the teal chart colour, because no line colour exists for investing until Phase 6. Colour is never the only
+  carrier: the table beside the bar names each part with its amount and share.

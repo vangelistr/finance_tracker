@@ -1,9 +1,10 @@
 # Progress
 
 Last updated: 2026-10-22
-Status: **Phases 0–4 done. Next: Phase 5 (Savings goals + Smart Plan).**
+Status: **Phases 0–5 done. Next: Phase 6 (Investing module).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 4: notification worker" commit on `build/finance-tracker`; Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
+Last verified commit: the "Phase 5: savings goals + Smart Plan" commit on `build/finance-tracker`; Phase 4 `de04e98`
+(CI green); Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
 including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 (after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
 
@@ -16,7 +17,7 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 2 Core | done | "Phase 2: core" (see `git log`) |
 | 3 Dashboard, charts, budgets | done | "Phase 3: dashboard, charts, budgets" (see `git log`) |
 | 4 Notification worker | done | "Phase 4: notification worker" (see `git log`) |
-| 5 Savings goals + Smart Plan | not started | — |
+| 5 Savings goals + Smart Plan | done | "Phase 5: savings goals + Smart Plan" (see `git log`) |
 | 6 Investing module | not started | — |
 | 7 Month-end report + tax/EFKA | not started | — |
 | 8 Release, deploy, hardening, handoff | not started | — |
@@ -91,6 +92,24 @@ overall budget; in-app notifications API isolation. Tour 64 captures, axe 0. Des
 Next: Phase 5 — savings goals (target, deadline, linked account, priority, contributions manual or from the plan,
 progress, required monthly, projected date) and the Smart Plan per `docs/allocation-methodology.md` §3 (pure functions,
 property test, formula and inputs shown, overrides, disclaimer).
+
+## Phase 5 summary (Savings goals + Smart Plan)
+
+Verified on 2026-10-22: lint and typecheck clean; 134 tests (Smart Plan pure functions on the four worked examples of
+`docs/allocation-methodology.md` §4, edge cases and a 200 000-case property test that the split always covers the
+baseline exactly; goal progress, required monthly and pace; plan view contract test: disclaimer, formula and inputs for
+every worked example, no buy/sell/predict wording outside the disclaimer; integration: goals CRUD and isolation, one
+emergency fund, contributions, plan split, idempotent apply, overrides and reset, goal stations on the calendar).
+`npm run build` green; tour 73 captures (adds goals and plan, applies the plan twice), axe 0; detector 0;
+`docker compose build && up`: all services healthy, migration `0004-goals` applied, `/api/ready` ready.
+Design review `docs/design-reviews/phase-5.md`. Decisions D-046…D-051. Also in this commit: CI Playwright browser cache
+(D-045).
+
+Next: Phase 6 — investing module behind the per-user flag (off by default): provider chain and budgets per
+`docs/MARKET-DATA.md`, cache, FX (Frankfurter, ECB), watchlist with the starter list, Insights ranking (PLAN §6.6) with
+educational labels, monthly suggestion fed by the plan's investing share, daily digest (off by default); mocks only
+because no market-data keys exist (B-003); tests that the module makes zero network calls when off and that no
+user-facing string says buy, sell or predicts.
 
 ## Open issues
 

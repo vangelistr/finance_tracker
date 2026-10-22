@@ -67,6 +67,27 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   await page.getByRole('button', { name: 'Αποθήκευση' }).click();
   await expect(page.getByText('Αποθηκεύτηκε')).toBeVisible();
 
+  // Savings goals: an emergency fund, and a holiday with a deadline and one contribution.
+  await page.goto('/goals');
+  await page.getByRole('button', { name: 'Δημιουργία αποθεματικού έκτακτης ανάγκης' }).click();
+  const efSheet = page.getByRole('dialog', { name: 'Νέος στόχος' });
+  await efSheet.getByLabel('Στόχος', { exact: true }).fill('3.000');
+  await efSheet.getByRole('button', { name: 'Αποθήκευση' }).click();
+  await expect(efSheet).toBeHidden();
+  await page.getByRole('button', { name: 'Νέος στόχος' }).click();
+  const goalSheet = page.getByRole('dialog', { name: 'Νέος στόχος' });
+  await goalSheet.getByLabel('Όνομα').fill('Διακοπές');
+  await goalSheet.getByLabel('Στόχος', { exact: true }).fill('900');
+  await goalSheet.getByLabel('Προθεσμία (προαιρετική)').fill('2027-06-30');
+  await goalSheet.getByRole('button', { name: 'Αποθήκευση' }).click();
+  await expect(goalSheet).toBeHidden();
+  await page.getByRole('listitem').filter({ hasText: 'Διακοπές' }).getByRole('button', { name: 'Κατάθεση' }).click();
+  const contribution = page.getByRole('dialog', { name: /Νέα κατάθεση/ });
+  await contribution.getByLabel('Ποσό').fill('180');
+  await contribution.getByRole('button', { name: 'Κατάθεση' }).click();
+  await expect(contribution).toBeHidden();
+  await expect(page.getByText('180,00 € από 900,00 €')).toBeVisible();
+
   // An in-app notification, as the worker would leave it, so the banner is part of the tour.
   if (process.env.MONGO_URL) {
     const client = await MongoClient.connect(process.env.MONGO_URL);
@@ -97,6 +118,8 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   for (const [path, name] of [
     ['/transactions', 'transactions'],
     ['/budgets', 'budgets'],
+    ['/goals', 'goals'],
+    ['/plan', 'plan'],
     ['/monthly', 'monthly'],
     ['/income', 'income'],
     ['/fixed', 'fixed'],
@@ -107,6 +130,13 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   ] as const) {
     await page.goto(path);
     await captureAll(page, name);
+  }
+
+  // The Smart Plan records this month's amounts on the goals; running it twice is safe.
+  await page.goto('/plan');
+  for (let i = 0; i < 2; i++) {
+    await page.getByRole('button', { name: 'Καταχώριση στους στόχους' }).click();
+    await expect(page.getByText('Οι καταθέσεις του μήνα καταχωρίστηκαν.')).toBeVisible();
   }
 
   // Quick-add sheet itself
