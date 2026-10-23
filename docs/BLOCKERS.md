@@ -41,6 +41,9 @@ Each item says why and what the user can do. Newest phase last.
 - **Decision:** The investing module is built and tested with mocked providers. No live calls with keys were made.
 - **User action:** Add free-tier keys to `.env`, then run the live check described in `docs/MARKET-DATA.md`
   ("Pending live verification").
+- **Phase 6 status (2026-10-23):** the provider adapters, chain, budgets, cache and FX are tested against mocked
+  responses shaped like the demo-key answers in `docs/MARKET-DATA.md`. Without keys the app shows "No key" for every
+  provider and uses manual prices; the FX call (Frankfurter, keyless) runs only while the module is on.
 
 ### B-004 R2 backup verification pending (no R2 credentials)
 
@@ -97,3 +100,14 @@ Each item says why and what the user can do. Newest phase last.
   SERVER-136848 for Ubuntu kernels, upgrade to the current 8.0.x: take a backup (`docker compose exec backup backup-now`),
   change the image tag in `docker-compose.yml` and `docker/backup/Dockerfile`, start, then run
   `db.adminCommand({ setFeatureCompatibilityVersion: "8.0", confirm: true })` as the root user.
+
+## Phase 6
+
+### B-011 Phase 5 image job on GitHub was cancelled, not failed
+
+- **What:** CI run 39838143427 (Phase 5 commit) passed `static` and `test`; its `image` job was cancelled by
+  `concurrency: cancel-in-progress` when the docs-only progress commit was pushed a minute later. The docs-only run
+  skipped the image job by its path filter, so the Phase 5 image was not rebuilt on GitHub.
+- **Mitigation:** the image built locally and ran healthy (Phase 5 summary), and the Phase 6 push rebuilds the image
+  from a tree that contains Phase 5. Its result is recorded in `docs/PROGRESS.md`.
+- **Lesson for the run:** do not push a docs-only commit while a phase run is still in progress.

@@ -31,6 +31,7 @@ export const NAV: NavItem[] = [
   { key: 'budgets', href: '/budgets', icon: Gauge },
   { key: 'goals', href: '/goals', icon: PiggyBank },
   { key: 'plan', href: '/plan', icon: BarChart3 },
+  { key: 'investing', href: '/investing', icon: LineChart, investingOnly: true },
   { key: 'income', href: '/income', icon: Wallet },
   { key: 'fixed', href: '/fixed', icon: Repeat },
   { key: 'accounts', href: '/accounts', icon: Landmark },
@@ -42,7 +43,6 @@ export const NAV: NavItem[] = [
 export const PLANNED: NavItem[] = [
   { key: 'reports', href: '/reports', icon: FileText },
   { key: 'tax', href: '/tax', icon: Receipt },
-  { key: 'investing', href: '/investing', icon: LineChart, investingOnly: true },
 ];
 
 /** Mobile bottom bar: the first two and the last destination flank the central Add button; the rest go to More. */

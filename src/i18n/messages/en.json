@@ -44,7 +44,8 @@
     "archived": "Archived",
     "monthly": "/month",
     "perMonthEquivalent": "{amount} a month",
-    "type": "Type"
+    "type": "Type",
+    "invalid": "Check this value"
   },
   "nav": {
     "main": "Main navigation",
@@ -286,7 +287,10 @@
     "overspendBody": "You spent {spent} of {budget} ({threshold} %).",
     "dismiss": "Dismiss",
     "open": "Open",
-    "unread": "{count, plural, one {# new notification} other {# new notifications}}"
+    "unread": "{count, plural, one {# new notification} other {# new notifications}}",
+    "digestTitle": "Investing ranking updated",
+    "digestBody": "Top-ranked by past-performance criteria: {symbols}. Data as of {date}. Educational, not financial advice.",
+    "digestBodyEmpty": "No instrument has enough price history to rank yet. Data as of {date}."
   },
   "status": {
     "expected": "Expected",
@@ -605,5 +609,214 @@
     "surplusInvesting": "Investing",
     "surplusUncommitted": "Not assigned",
     "applyHint": "Adds this month’s amounts to the goals as contributions. Running it again updates them."
+  },
+  "investing": {
+    "title": "Investing",
+    "tabs": {
+      "ranking": "Ranking",
+      "suggestion": "Monthly suggestion",
+      "watchlist": "Watchlist",
+      "profile": "Profile and limits"
+    },
+    "dataAsOf": "Prices up to {date}",
+    "dataNone": "No prices yet",
+    "fxAsOf": "EUR at the ECB rate of {date}",
+    "fxNone": "No ECB rate yet: prices stay in their trading currency",
+    "staleCount": "{count, plural, one {# quote is stale} other {# quotes are stale}}",
+    "allCurrent": "All quotes are current",
+    "stale": "Stale",
+    "staleSince": "Missing the close of {date}",
+    "source": {
+      "twelvedata": "Twelve Data",
+      "eodhd": "EODHD",
+      "fmp": "FMP",
+      "alphavantage": "Alpha Vantage",
+      "finnhub": "Finnhub",
+      "manual": "Manual price"
+    },
+    "rank": "Rank",
+    "instrument": "Instrument",
+    "score": "Score",
+    "price": "Last close",
+    "metric": {
+      "r1m": "Return, 1 month",
+      "r3m": "Return, 3 months",
+      "r6m": "Return, 6 months",
+      "r12m": "Return, 12 months",
+      "volatility": "Volatility (yearly)",
+      "drawdown": "Largest fall, 12 months",
+      "trend": "Against the 200-day average",
+      "riskAdjusted": "12-month return per unit of volatility",
+      "cost": "Cost (TER)"
+    },
+    "short": {
+      "r12m": "12 m",
+      "volatility": "Vol."
+    },
+    "why": "How this score was built",
+    "whyIntro": "Each figure becomes a percentile within your watchlist (100 = highest in the list; for volatility, fall and cost, 100 = lowest). The score is the weighted mean of the percentiles that have data.",
+    "value": "Value",
+    "percentile": "Percentile",
+    "weight": "Weight",
+    "noData": "no data",
+    "coverage": "Weight with data: {pct} %",
+    "insufficientTitle": "Not enough history to rank",
+    "insufficientRow": "{points} of 252 trading days. It joins the ranking once at least half of the weight has data.",
+    "emptyTitle": "The watchlist is empty",
+    "emptyBody": "Add instruments in the watchlist to see them ranked.",
+    "noPricesTitle": "No prices yet",
+    "noPricesBody": "With a provider key in .env, prices arrive with the daily refresh at 07:30 Athens time, after the US close. Without one, enter prices by hand in the watchlist.",
+    "status": "Data status",
+    "provider": "Provider",
+    "keySet": "Key set",
+    "noKey": "No key",
+    "callsToday": "Calls today",
+    "callsOf": "{calls} of {budget}",
+    "paused": "Paused until the daily reset",
+    "statusHint": "Free tiers only. Requests carry ticker symbols and dates, nothing about you. Budgets stay at 80 % of each free limit.",
+    "noKeys": "No provider key is set, so prices come only from manual entry. docs/MARKET-DATA.md explains how to add free keys.",
+    "fxSource": "Exchange rates: ECB reference rates through Frankfurter.",
+    "lastError": "No provider had a current price on the last attempt.",
+    "euNote": "May not be available to EU retail investors; check your broker.",
+    "core": "Core",
+    "manual": "Manual",
+    "suggestion": {
+      "amount": "This month’s investing amount",
+      "fromPlan": "From the Smart Plan: {pct} % of the baseline of {baseline}.",
+      "planLink": "Open the Smart Plan",
+      "zero": "The Smart Plan sets no investing amount this month, so there is nothing to split.",
+      "held": "{amount} is held back until the emergency fund is large enough.",
+      "profile": "Risk profile",
+      "profileSource": {
+        "default": "cautious default until you answer the questionnaire",
+        "questionnaire": "from your answers",
+        "override": "chosen by you"
+      },
+      "rules": "Top {n} ranked instruments, at least {core} % to broad-market ETFs (core), at most {inst} % per instrument, {region} % per region and {currency} % per currency.",
+      "formula": "The core share goes first, split by score; the rest goes to the other instruments by score. Any amount above a limit moves to the next instrument with room. Cents are rounded down and the rest goes in rank order.",
+      "split": "Split",
+      "share": "Share",
+      "unallocated": "Not placed (limits reached)",
+      "total": "Total",
+      "excluded": "Left out",
+      "reason": {
+        "insufficient_data": "not enough history",
+        "leveraged": "leveraged, off in your limits",
+        "crypto": "crypto, off in your limits",
+        "below_top_n": "below the top {n}"
+      },
+      "notes": {
+        "no_core": "No core instrument is eligible, so the core share goes to the others.",
+        "no_other": "Only core instruments are eligible, so they take the whole amount.",
+        "core_short": "The limits kept the core share below its minimum.",
+        "caps_reached": "The limits leave part of the amount unplaced. Raise a limit, or add instruments in other regions or currencies.",
+        "nothing_eligible": "No instrument has enough price history yet, so nothing can be split."
+      },
+      "cap": {
+        "instrument": "instrument limit",
+        "region": "region limit",
+        "currency": "currency limit"
+      }
+    },
+    "watchlist": {
+      "add": "Add instrument",
+      "edit": "Edit instrument",
+      "count": "{count} of {max} instruments",
+      "warnLarge": "More than 30 instruments may not fit the free daily call budgets.",
+      "starterNote": "It starts with an educational list you can edit. The list is not a recommendation.",
+      "symbol": "Ticker",
+      "exchange": "Exchange",
+      "isin": "ISIN (optional)",
+      "currency": "Trading currency",
+      "type": "Type",
+      "region": "Region",
+      "domicile": "Domicile",
+      "domicileHint": "Two-letter country code, for example IE or US",
+      "ter": "TER (%)",
+      "terHint": "Yearly cost from the issuer’s page; leave empty for shares",
+      "coreLabel": "Core holding",
+      "coreHint": "A broad-market ETF that can take the core share of the split",
+      "leveraged": "Leveraged product",
+      "crypto": "Crypto product",
+      "providerSymbols": "Provider symbols",
+      "providerHint": "Only if a provider lists this instrument under another symbol, for example IWDA.AS on EODHD.",
+      "remove": "Remove",
+      "removeConfirm": "Remove {symbol} and its manual prices?",
+      "manualPrice": "Enter price",
+      "manualTitle": "Manual price: {symbol}",
+      "manualHint": "The closing price in {currency} on that day. It is used where no provider has a price.",
+      "priceLabel": "Price in {currency}",
+      "invalidPrice": "Enter a price above zero, for example 104.25",
+      "fixedListing": "Ticker and exchange identify the price history, so they cannot change. Remove and add the instrument to change them.",
+      "types": {
+        "etf": "ETF",
+        "stock": "Share"
+      },
+      "regions": {
+        "global": "Global",
+        "us": "United States",
+        "europe": "Europe",
+        "emerging": "Emerging markets",
+        "asia_pacific": "Asia-Pacific",
+        "other": "Other"
+      },
+      "exists": "This listing is already on the watchlist.",
+      "limit": "The watchlist holds at most 40 instruments."
+    },
+    "profile": {
+      "questionnaire": "Risk questionnaire",
+      "intro": "Three questions set how many instruments the monthly split uses and how much of it goes to broad-market ETFs.",
+      "q": {
+        "horizon": "When might you need this money?",
+        "drawdown": "If your investments fell 20 % in a year, what would you do?",
+        "experience": "How long have you been investing?"
+      },
+      "a": {
+        "horizon": {
+          "short": "Within 3 years",
+          "medium": "In 3 to 10 years",
+          "long": "In more than 10 years"
+        },
+        "drawdown": {
+          "reduce": "Invest less or stop",
+          "keep": "Keep the plan as it is",
+          "continue": "Keep going, maybe a little more"
+        },
+        "experience": {
+          "none": "Not yet",
+          "some": "Up to 3 years",
+          "years": "More than 3 years"
+        }
+      },
+      "result": "From your answers: {profile} ({points} of 6 points).",
+      "shortRule": "A horizon under 3 years always gives the conservative profile.",
+      "profiles": {
+        "conservative": "Conservative",
+        "balanced": "Balanced",
+        "growth": "Growth"
+      },
+      "profileRule": "{n} instruments, at least {core} % core",
+      "inForce": "In force: {profile}",
+      "override": "Profile",
+      "overrideNone": "Follow my answers",
+      "limits": "Diversification limits",
+      "maxInstrument": "Most per instrument (%)",
+      "maxRegion": "Most per region (%)",
+      "maxCurrency": "Most per currency (%)",
+      "limitHint": "5 to 100",
+      "allowLeveraged": "Allow leveraged products",
+      "allowCrypto": "Allow crypto products",
+      "weights": "Ranking weights",
+      "weightsHint": "How much each figure counts in the score, 0 to 100. 0 leaves it out.",
+      "defaultValue": "default {value}",
+      "save": "Save",
+      "saveAnswers": "Save answers",
+      "reset": "Restore all defaults",
+      "saved": "Saved.",
+      "title": "Profile used for the split"
+    },
+    "figure": "Figure",
+    "key": "API key",
+    "noPrice": "No price yet"
   }
 }

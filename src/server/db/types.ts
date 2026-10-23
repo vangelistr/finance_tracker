@@ -3,6 +3,8 @@ import type { LocalDate } from '@/lib/dates';
 import type { Minor } from '@/lib/money';
 import type { Schedule } from '@/lib/recurrence';
 import type { PlanSettings } from '@/lib/plan';
+import type { Exchange, InstrumentType, ProviderId, ProviderSymbols, Region } from '@/lib/investing/instruments';
+import type { InvestingSettings } from '@/lib/investing/settings';
 
 export type Locale = 'el' | 'en';
 export type Theme = 'system' | 'light' | 'dark';
@@ -23,6 +25,8 @@ export interface UserSettings {
   notifications: NotificationSettings;
   /** Smart Plan overrides; missing keys use DEFAULT_PLAN_SETTINGS. */
   plan?: Partial<PlanSettings>;
+  /** Investing module settings; missing keys use DEFAULT_INVESTING_SETTINGS. `seeded` marks the starter list as added once. */
+  investing?: Partial<InvestingSettings> & { seeded?: boolean };
 }
 
 export interface UserDoc {
@@ -283,6 +287,94 @@ export interface GoalContributionDoc {
   planMonth: string | null;
   note: string;
   createdAt: Date;
+}
+
+// ---- Investing module (Phase 6) ----
+
+export interface WatchlistDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  symbol: string;
+  exchange: Exchange;
+  /** `SYMBOL:EXCHANGE`, the shared key of the listing's price history. */
+  instrumentKey: string;
+  name: string;
+  isin: string | null;
+  currency: string;
+  type: InstrumentType;
+  region: Region;
+  /** ISO country code of the fund or company domicile. */
+  domicile: string;
+  terBps: number | null;
+  core: boolean;
+  leveraged: boolean;
+  crypto: boolean;
+  providerSymbols: ProviderSymbols;
+  seq: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ManualPriceDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  instrumentKey: string;
+  localDate: LocalDate;
+  priceMicros: number;
+  currency: string;
+  createdAt: Date;
+}
+
+/** Shared public market data: one end-of-day close per listing and bar date (exchange local date). */
+export interface PriceDoc {
+  _id: ObjectId;
+  instrumentKey: string;
+  date: LocalDate;
+  closeMicros: number;
+  currency: string | null;
+  provider: ProviderId;
+  /** True when the close is adjusted for splits and dividends (EODHD `adjusted_close`). */
+  adjusted: boolean;
+  fetchedAt: Date;
+  /** TTL: bars older than the metrics window expire. */
+  expiresAt: Date;
+}
+
+export interface PriceMetaDoc {
+  _id: string; // instrumentKey, or 'fx' for the exchange-rate feed
+  lastDate: LocalDate | null;
+  provider: ProviderId | 'frankfurter' | null;
+  fetchedAt: Date | null;
+  lastAttemptSlot: string | null;
+  lastAttemptAt: Date | null;
+  lastError: string | null;
+}
+
+/** Negative cache per (provider, listing): `not_covered` for 30 days, `error` for an hour (TTL on `until`). */
+export interface ProviderOutcomeDoc {
+  _id: string; // `${provider}:${instrumentKey}`
+  status: 'not_covered' | 'error';
+  detail: string;
+  until: Date;
+}
+
+/** Call counters per provider day (`provider:YYYY-MM-DD`) and minute (`provider:m:YYYY-MM-DDTHH:MM`). */
+export interface ProviderUsageDoc {
+  _id: string;
+  provider: ProviderId | 'frankfurter';
+  calls: number;
+  /** Set when the provider answered with a quota or key error: no more calls until its reset. */
+  blocked?: boolean;
+  expiresAt: Date;
+}
+
+/** ECB reference rates, euro base: units of each currency per 1 EUR, for the date the ECB published. */
+export interface FxRateDoc {
+  _id: LocalDate;
+  base: 'EUR';
+  rates: Record<string, number>;
+  fetchedAt: Date;
+  expiresAt: Date;
 }
 
 // Re-exported so domain documents added in later phases share one import path.

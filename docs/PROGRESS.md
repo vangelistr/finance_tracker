@@ -1,9 +1,10 @@
 # Progress
 
-Last updated: 2026-10-22
-Status: **Phases 0–5 done. Next: Phase 6 (Investing module).**
+Last updated: 2026-10-23
+Status: **Phases 0–6 done. Next: Phase 7 (Month-end report + tax/EFKA).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 5: savings goals + Smart Plan" commit on `build/finance-tracker`; Phase 4 `de04e98`
+Last verified commit: the "Phase 6: investing module" commit on `build/finance-tracker` (CI result below); Phase 5 `b56be99`
+(static + test green on GitHub, image job cancelled by concurrency, B-011); Phase 4 `de04e98`
 (CI green); Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
 including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 (after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
@@ -18,7 +19,7 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 3 Dashboard, charts, budgets | done | "Phase 3: dashboard, charts, budgets" (see `git log`) |
 | 4 Notification worker | done | "Phase 4: notification worker" (see `git log`) |
 | 5 Savings goals + Smart Plan | done | "Phase 5: savings goals + Smart Plan" (see `git log`) |
-| 6 Investing module | not started | — |
+| 6 Investing module | done | "Phase 6: investing module" (see `git log`) |
 | 7 Month-end report + tax/EFKA | not started | — |
 | 8 Release, deploy, hardening, handoff | not started | — |
 
@@ -111,21 +112,29 @@ educational labels, monthly suggestion fed by the plan's investing share, daily 
 because no market-data keys exist (B-003); tests that the module makes zero network calls when off and that no
 user-facing string says buy, sell or predicts.
 
-## Where the run stands (user went offline, 2026-10-22)
+## Phase 6 summary (Investing module)
 
-- Done and pushed: Phases 0-5. Phase 5 is commit `b56be99` on `build/finance-tracker`. Its CI run (id 39838143427) was still
-  in progress when this note was written; the result is not yet confirmed. Check with `gh run view 39838143427`.
-- In progress: Phase 6 (Investing module). Only reading was done: the brief (req. 11), PLAN sections 6.6 and 8,
-  `docs/MARKET-DATA.md`, the existing flag and hooks. **No Phase 6 files exist yet; the working tree is clean.**
-- Existing hooks Phase 6 plugs into: `settings.investingEnabled` (users, setup wizard, settings ModulesForm),
-  `notifications.marketDigest` (off by default, toggle already in settings), the `investing` nav entry in `PLANNED`
-  (`src/components/shell/nav.ts`, `investingOnly`), the `monthlyBodyInvesting` message, `src/worker/jobs.ts` (add the
-  market refresh and digest jobs), env keys `TWELVEDATA_API_KEY`, `EODHD_API_KEY`, `FMP_API_KEY`, `ALPHAVANTAGE_API_KEY`,
-  `FINNHUB_API_KEY`, `FX_BASE_URL` (all keys are empty, so providers are mocked, B-003).
-- Next step: build `src/lib/investing/` pure functions (metrics, scoring, split with caps; PLAN 6.6) with unit tests, then
-  `src/server/market/` (provider interface, chain, budgets, TTL cache, FX), the `/investing` pages and API (404 when off),
-  the worker refresh and digest jobs, the zero-network-when-off test and the i18n wording test.
-- Open issues: none new.
+Verified on 2026-10-23: lint and typecheck clean; **181 tests** (adds: metrics, ranking with ties and insufficient
+data, split with caps, infeasible caps, top N, leverage/crypto and a 5 000-case property test that lines + unplaced
+always equal the amount within every cap; exchange calendar and refresh slots across the DST change; adapter parsing
+and error mapping for all five providers and Frankfurter; integration: **zero fetch calls and no counters while the
+module is off, with provider keys set, through the real worker job list**; 404 on every investing route when off;
+per-instrument routing, fallback on error / not covered / rate limit, daily budget never exceeded with three racing
+refreshes, per-minute deferral, retry-slot fallback, ECB v2 with v1 fallback, EUR conversion, timestamps and staleness,
+manual price as last resort, watchlist CRUD and isolation, 40-instrument cap, suggestion = Smart Plan investing amount,
+data status never exposes keys, digest once a day after the refresh and only when enabled; i18n test: no buy, sell,
+predict, signal or "best" wording in either language outside the two disclaimers).
+`npm run build` green; tour 93 captures (adds 20 investing captures and the off-state 404 check), axe 0; detector 0;
+`docker compose build && up`: all services healthy, migration `0005-investing` applied, `/api/ready` ready, worker
+without errors. Market data: mocks only (no keys, B-003). Design review `docs/design-reviews/phase-6.md`.
+Decisions D-052…D-059. No new dependencies.
+
+Next: Phase 7 — month-end report (generated once per closed month by the worker on the 1st or lazily, immutable
+snapshot with the PLAN 6.7 contents, history page, print stylesheet; `reports` collection, unique `{userId, month}`)
+and the tax/EFKA estimator (`config/tax/<year>.json` per `docs/research/tax-efka.md`, editable per-user copy with sources
+and last-reviewed dates, per-invoice/month/year set-aside into the tax reserve bucket, other annual income input,
+[uncertain] marks, "estimate, not tax advice; confirm with an accountant" on every figure; feed the Smart Plan's
+`taxReserveDueMinor`). Then add `reports` and `tax` to `NAV` from `PLANNED`.
 
 ## Open issues
 

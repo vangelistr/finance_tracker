@@ -37,6 +37,13 @@ export const MIGRATIONS: Migration[] = [
       // Goals and contributions (indexes from ensureIndexes).
     },
   },
+  {
+    id: '0005-investing',
+    up: async () => {
+      // Watchlist, manual prices and the shared market-data collections (indexes from ensureIndexes). The starter
+      // watchlist is added per user the first time the module's pages open (D-053).
+    },
+  },
 ];
 
 export async function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): Promise<string[]> {

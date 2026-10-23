@@ -20,6 +20,13 @@ import type {
   RateLimitDoc,
   SessionDoc,
   UserDoc,
+  WatchlistDoc,
+  ManualPriceDoc,
+  PriceDoc,
+  PriceMetaDoc,
+  ProviderOutcomeDoc,
+  ProviderUsageDoc,
+  FxRateDoc,
 } from './types';
 
 export function collectionsOf(db: Db) {
@@ -42,6 +49,14 @@ export function collectionsOf(db: Db) {
     budgets: db.collection<BudgetDoc>('budgets'),
     goals: db.collection<GoalDoc>('goals'),
     goalContributions: db.collection<GoalContributionDoc>('goal_contributions'),
+    watchlist: db.collection<WatchlistDoc>('watchlist'),
+    manualPrices: db.collection<ManualPriceDoc>('manual_prices'),
+    // Shared collections below hold public market data and counters only, never user data.
+    prices: db.collection<PriceDoc>('prices'),
+    priceMeta: db.collection<PriceMetaDoc>('price_meta'),
+    providerOutcomes: db.collection<ProviderOutcomeDoc>('provider_outcomes'),
+    providerUsage: db.collection<ProviderUsageDoc>('provider_usage'),
+    fxRates: db.collection<FxRateDoc>('fx_rates'),
   };
 }
 
@@ -115,6 +130,18 @@ export const INDEXES: Record<string, IndexDescription[]> = {
       partialFilterExpression: { planMonth: { $type: 'string' } },
     },
   ],
+  watchlist: [
+    { key: { userId: 1, symbol: 1, exchange: 1 }, name: 'user_listing_unique', unique: true },
+    { key: { userId: 1, seq: 1 }, name: 'user_list' },
+  ],
+  manual_prices: [{ key: { userId: 1, instrumentKey: 1, localDate: 1 }, name: 'user_listing_date_unique', unique: true }],
+  prices: [
+    { key: { instrumentKey: 1, date: 1 }, name: 'listing_date_unique', unique: true },
+    { key: { expiresAt: 1 }, name: 'ttl', expireAfterSeconds: 0 },
+  ],
+  provider_outcomes: [{ key: { until: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
+  provider_usage: [{ key: { expiresAt: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
+  fx_rates: [{ key: { expiresAt: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
 };
 
 export async function ensureIndexes(db: Db): Promise<void> {

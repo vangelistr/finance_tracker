@@ -345,3 +345,60 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 - Essentials use Line Red (money that must be spent), savings Line Ochre (goals), discretionary the neutral slate and
   investing the teal chart colour, because no line colour exists for investing until Phase 6. Colour is never the only
   carrier: the table beside the bar names each part with its amount and share.
+
+## Phase 6 (Investing module)
+
+### D-052 Market prices as integer micro-units
+- Shared `prices` and per-user `manual_prices` store the close as an integer number of millionths of the trading
+  currency (`closeMicros`, `priceMicros`), never a float, following the money rule. Six decimals cover quotes such as
+  GBX and sub-cent prices; the bound (10^15) stays inside `Number.MAX_SAFE_INTEGER`. Metrics convert to numbers only
+  for ratios. EUR display values are integer cents (`toEurMinor`), rounded once.
+- FX rates stay decimal numbers: they are ratios published by the ECB, not money.
+
+### D-053 Starter watchlist on the first visit
+- The 10-row educational list from `docs/MARKET-DATA.md` 6.1 is added the first time a user with the module on opens
+  any investing page or the watchlist API, and `settings.investing.seeded` is set, so deleted rows never return. Every
+  investing page calls `requireInvestingUser()` itself because Next.js renders a layout and its page concurrently.
+- AGGH (bonds) is not flagged `core`, so the core share goes to broad equity ETFs only.
+
+### D-054 Risk questionnaire
+- Three questions (horizon, reaction to a 20 % fall, experience), each answer 0–2 points by position: 0–2
+  conservative, 3–4 balanced, 5–6 growth. A horizon under 3 years is always conservative. Until answered the
+  conservative profile applies, labelled "default". The user can override the profile. Profiles map to PLAN 6.6:
+  top 3 / 5 / 7 instruments with at least 80 / 60 / 40 % core. Design choice without a numeric source; educational.
+
+### D-055 Refresh slots, attempts and per-minute caps
+- Two slots a day in Europe/Athens, 07:30 and 12:30 (MARKET-DATA 5.4). The worker evaluates every tick; each stale
+  listing is attempted at most once per slot (`price_meta.lastAttemptSlot`), so restarts never repeat calls and a
+  worker that was down catches up on its first tick. Fresh listings cost nothing.
+- Expected close = the last trading day before today in the exchange's own time zone (NYSE 2026–2027 holidays,
+  Euronext 2026; Xetra, LSE, Milan and SIX use weekdays only, [uncertain]).
+- At 07:30 an older bar than expected is kept ("not yet published"); at 12:30 the chain moves on to the next provider.
+- A full per-minute cap defers the listing to the next tick instead of spending a smaller budget further down the
+  chain. A full daily budget, a quota/key error (blocks the provider until the next UTC midnight), a missing listing
+  (cached 30 days) or an error (cached 1 hour) falls through to the next provider; after the chain, manual prices.
+- Calls are reserved before they are made with a conditional upsert on `provider_usage`, so a counter can never pass
+  its budget, also with racing workers (tested).
+
+### D-056 Provider response mapping
+- 401, 402 and 429 → stop the provider for the day; 403 and 404 → not covered for that listing; other codes → error.
+  Twelve Data errors inside a 200 body follow their `code`; its "No data is available" answer is an empty success.
+  FMP 402 means a premium endpoint or symbol → not covered. Alpha Vantage 200 without a series and with `Information`
+  or `Note` → blocked; `Error Message` → not covered. Finnhub `/quote` with `c = 0` → not covered.
+- Each request carries only the provider symbol, dates and the key (header where the provider accepts one).
+
+### D-057 Ranking and split details
+- Percentile within the watchlist with ties sharing the mid rank; a single instrument gets 100. Scores are rounded
+  to 6 decimals so ties are exact. "Insufficient data" = less than half of the active weight available.
+- Split weights are the scores with a floor of 1, so every selected instrument gets a share. The core target is
+  rounded up ("at least"). Amounts refused by caps on one side are offered to the other side, then shown as "not
+  placed (limits reached)". Each line names the cap it reached. Tested on fixtures and a 5 000-case property test.
+
+### D-058 Investing colour and screens
+- Investing keeps the teal chart colour from D-051 (no line colour exists for it). Core holdings carry a teal dot
+  with the word "Core"; the split bar uses full teal for core lines and a lighter teal for the others, and the table
+  beside it carries every number. Four views under one sub-navigation: ranking (with data status), monthly
+  suggestion, watchlist, profile and limits.
+
+### D-059 No new dependencies
+- Phase 6 uses the platform `fetch` with `AbortSignal.timeout` (15 s) and the existing stack; nothing was added.

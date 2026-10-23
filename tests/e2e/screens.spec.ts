@@ -139,6 +139,63 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
     await expect(page.getByText('Οι καταθέσεις του μήνα καταχωρίστηκαν.')).toBeVisible();
   }
 
+  // Investing module: absent while off, then turned on in Settings with cached prices as the worker would leave them.
+  expect((await page.goto('/investing'))!.status()).toBe(404);
+  await page.goto('/settings');
+  await expect(page.getByRole('link', { name: 'Επενδύσεις' })).toHaveCount(0);
+  await page.getByRole('switch', { name: /Ενότητα επενδύσεων/ }).click();
+  await expect(page.getByRole('switch', { name: /Ενότητα επενδύσεων/ })).toHaveAttribute('aria-checked', 'true');
+  await page.goto('/investing/watchlist');
+  await expect(page.getByText('10 από 40 μέσα')).toBeVisible();
+  if (process.env.MONGO_URL) {
+    const client = await MongoClient.connect(process.env.MONGO_URL);
+    const db = client.db();
+    const keys = (await db.collection('watchlist').find({}).toArray()).map((w) => ({ key: w.instrumentKey as string, currency: w.currency as string }));
+    const dates: string[] = [];
+    for (let d = new Date(Date.now() - 86_400_000); dates.length < 300; d = new Date(d.getTime() - 86_400_000)) {
+      if (d.getUTCDay() !== 0 && d.getUTCDay() !== 6) dates.unshift(d.toISOString().slice(0, 10));
+    }
+    // IWDA stays without prices to show the "not enough history" state; SXR8 gets a short manual-like history.
+    const docs = keys
+      .filter((k) => !k.key.startsWith('IWDA'))
+      .flatMap((k, n) =>
+        (k.key.startsWith('SXR8') ? dates.slice(-40) : dates).map((date, i) => ({
+          instrumentKey: k.key,
+          date,
+          closeMicros: Math.round((80 + n * 23) * (1 + (0.0002 * (n + 1) - 0.0001)) ** i * (1 + 0.012 * Math.sin(i / (3 + n))) * 1e6),
+          currency: k.currency,
+          provider: k.currency === 'USD' ? 'twelvedata' : 'eodhd',
+          adjusted: k.currency !== 'USD',
+          fetchedAt: new Date(),
+          expiresAt: new Date(Date.now() + 400 * 86_400_000),
+        })),
+      );
+    await db.collection('prices').insertMany(docs);
+    // No emergency fund in the tour, so the plan would hold investing back; let it through to show a split.
+    await db.collection('users').updateOne({ role: 'owner' }, { $set: { 'settings.plan.investWhileEfUnfunded': true } });
+    await db.collection('fx_rates').insertOne({ _id: dates.at(-1) as never, base: 'EUR', rates: { USD: 1.1234, GBP: 0.83825 }, fetchedAt: new Date(), expiresAt: new Date(Date.now() + 400 * 86_400_000) });
+    await client.close();
+  }
+  await page.goto('/investing/profile');
+  await page.getByLabel('Σε περισσότερα από 10 χρόνια').check();
+  await page.getByLabel('Θα κρατούσα το πλάνο όπως είναι').check();
+  await page.getByLabel('Έως 3 χρόνια').check();
+  await page.getByRole('button', { name: 'Αποθήκευση απαντήσεων' }).click();
+  await expect(page.getByText('Αποθηκεύτηκε.')).toBeVisible();
+  for (const [path, name] of [
+    ['/investing', 'investing-ranking'],
+    ['/investing/suggestion', 'investing-suggestion'],
+    ['/investing/watchlist', 'investing-watchlist'],
+    ['/investing/profile', 'investing-profile'],
+  ] as const) {
+    await page.goto(path);
+    await captureAll(page, name);
+  }
+  await page.goto('/investing/watchlist');
+  await page.getByRole('button', { name: 'Προσθήκη μέσου' }).click();
+  await captureAll(page, 'investing-add');
+  await page.keyboard.press('Escape');
+
   // Quick-add sheet itself
   await page.setViewportSize({ width: 375, height: 812 });
   await page.emulateMedia({ colorScheme: 'light' });

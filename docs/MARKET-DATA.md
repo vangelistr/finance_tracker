@@ -399,3 +399,18 @@ Done in this research, nothing pending, except: confirm the real publish time by
 11. Refresh timing: provider EOD availability for FMP, Alpha Vantage and Finnhub; trading hours of LSE, Xetra and Euronext (pages did not give them or were not read); holiday calendars for Xetra and LSE; the EU summer-time changeover hour (01:00 UTC) was not on the Commission page I read.
 12. Demo keys: EODHD lists two different demo ticker sets on its docs pages, and a live call showed that `MSFT.US` also works with the demo token. The demo set can change at any time, so tests must not depend on it.
 
+
+## 10. Implementation (Phase 6, 2026-10-23)
+
+How the findings above are used in code. No live call with a provider key has been made (no keys, B-003).
+
+| Topic | Where | Notes |
+|---|---|---|
+| Exchanges, chain per market, provider symbols, starter list | `src/lib/investing/instruments.ts` | US listings: Twelve Data → EODHD → FMP → Alpha Vantage → Finnhub; Europe: EODHD → Alpha Vantage; other: manual only. Per-instrument `providerSymbols` override the derived symbol. |
+| Exchange calendar, expected close, refresh slots | `src/lib/investing/calendar.ts` | NYSE holidays 2026–2027 and Euronext 2026 from section 5.2; slots 07:30 and 12:30 Europe/Athens. |
+| Adapters and response mapping | `src/server/market/providers.ts` | Budgets from 7.2 (`PROVIDER_BUDGETS`); mapping in D-056. |
+| Budgets and blocks | `src/server/market/budget.ts` | `provider_usage` counters per UTC day and minute, reserved before each call. |
+| Chain, negative cache, TTL price cache | `src/server/market/refresh.ts` | `provider_outcomes` (30 days / 1 hour, TTL), `prices` (TTL 400 days after the bar date), `price_meta`. |
+| FX | `src/server/market/fx.ts` | `/v2/rates?providers=ECB&base=EUR&quotes=USD,GBP,CHF,JPY`, fallback `/v1/latest`, then the last stored rate with its date. |
+| Worker jobs | `src/worker/jobs/market.ts` | Refresh and digest return before any provider is built while no user has the module on (zero-call test). |
+| Ranking and split | `src/lib/investing/{metrics,ranking,split}.ts` | PLAN 6.6. |
