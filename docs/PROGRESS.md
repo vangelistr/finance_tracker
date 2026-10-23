@@ -3,12 +3,8 @@
 Last updated: 2026-10-23
 Status: **All phases (0–8) done.** Handoff: `docs/HANDOFF.md` (Greek).
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: `b655cd5` "Phase 7: month-end report + tax/EFKA" (CI run 39972067875 green, all jobs);
-Phase 6 `b7bd263` (CI run 39967390812 green, all jobs incl. image); Phase 5 `b56be99`
-(static + test green on GitHub, image job cancelled by concurrency, B-011); Phase 4 `de04e98`
-(CI green); Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
-including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
-(after two fixes: `public/` on a clean checkout, and MongoDB 7.0.45 because 8.0 exits on Linux 6.19+, D-036).
+Last verified commit: `96379e1` "Phase 8: release, deploy, hardening, handoff" (CI run 39974416701 green, all jobs
+incl. image); Phase 7 `b655cd5` (run 39972067875 green); Phase 6 `b7bd263` (run 39967390812 green).
 
 ## Phases
 
@@ -22,7 +18,7 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 5 Savings goals + Smart Plan | done | "Phase 5: savings goals + Smart Plan" (see `git log`) |
 | 6 Investing module | done | `b7bd263` |
 | 7 Month-end report + tax/EFKA | done | `b655cd5` |
-| 8 Release, deploy, hardening, handoff | done | "Phase 8: release, deploy, hardening, handoff" (see `git log`) |
+| 8 Release, deploy, hardening, handoff | done | `96379e1` |
 
 ## Phase 0 summary
 
