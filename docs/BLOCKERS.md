@@ -114,3 +114,15 @@ Each item says why and what the user can do. Newest phase last.
   from a tree that contains Phase 5. Its result is recorded in `docs/PROGRESS.md`.
 - **Lesson for the run:** do not push a docs-only commit while a phase run is still in progress.
 - **Resolved:** the Phase 6 run (39967390812) passed every job, including the image build.
+
+## Phase 8
+
+### B-012 Server-side steps not run (forbidden for the build)
+
+- **What:** The build may not access the server, Tailscale or the GitHub repository settings. So these were not
+  run: the first real deploy from GHCR, `tailscale serve` on the server (the README command is composed from the
+  documented flags, D-066), the tailnet ACL, the Hetzner firewall review, branch protection, the auto-updater timer.
+- **Verified instead:** `deploy/deploy.sh` and `deploy/rollback.sh` against Docker Compose locally (17 checks,
+  `npm run test:deploy`), the Release workflow with actionlint, both images with Trivy (no critical findings).
+- **User action:** follow README "Server setup", then "Tailscale serve"; check `tailscale serve status` and open the
+  app from a phone on the tailnet. If port 443 conflicts with another service, use the `--https=8443` fallback.

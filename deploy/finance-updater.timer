@@ -1,0 +1,12 @@
+# Checks for a newer `main` image every 15 minutes. Enable only when you want automatic deploys.
+[Unit]
+Description=Finance Tracker auto-update check
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=15min
+RandomizedDelaySec=2min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

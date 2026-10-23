@@ -22,7 +22,8 @@ describe('chart components render the fixture totals', () => {
     expect(c).toContain('684,50 €');
     expect(c).toContain('210,30 €');
     expect(html).toContain('939,80 €'); // centre total
-    const shares = c.filter((x) => x.endsWith('%')).map((x) => Number.parseFloat(x));
+    const shares = c.filter((x) => x.endsWith('%')).map((x) => Number.parseFloat(x.replace(',', '.')));
+    expect(c.filter((x) => x.endsWith('%')).every((x) => /^\d+,\d %$/.test(x))).toBe(true);
     expect(shares.reduce((a, b) => a + b, 0)).toBeCloseTo(100, 5);
   });
 

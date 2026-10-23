@@ -444,3 +444,40 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 ### D-064 Horizontal overflow guard
 - The screenshot tour now fails when any screen is wider than its viewport. It found absolutely positioned
   `sr-only` header cells escaping an unpositioned scroll wrapper on the tax tables; scroll wrappers are `relative`.
+
+## Phase 8 (Release, deploy, hardening, handoff)
+
+### D-065 Deploy scripts
+- `deploy/lib.sh` holds the shared steps; settings come from the caller's environment, then `.env` read key by key
+  (never sourced whole). State lives in `.deploy/` (gitignored): `current`, `previous`, `history`, `attempts`,
+  `deploy.log`.
+- The first deploy skips the pre-deploy backup because no backup service runs yet; every later deploy stops if the
+  backup fails. MongoDB is started with `up --wait` before the migrations run as a one-off container.
+- Rollback (automatic or `rollback.sh`) does not run migrations: they are forward-only and additive, so the
+  previous release runs on the newer schema.
+- Pruning keeps the images of the last 3 tags the script deployed or attempted (plus current and previous) and
+  removes older ones it pulled. A first version ranked every local tag by creation time and, in the local test,
+  removed newer images that had not been deployed yet; the attempt list fixes that and leaves images the script
+  never handled alone. Only this project's two repositories are touched.
+- `deploy/dc.sh` runs Compose on the recorded tag, so manual commands on the server never build `local`.
+- The optional updater reads the OCI `revision` label of the moving `main` image (set by `docker/metadata-action`)
+  and deploys the matching `sha-` tag; the timer ships disabled.
+- Tested locally by `npm run test:deploy` (17 checks) in a throwaway Compose project on port 3310.
+
+### D-066 Runbook sources
+- Tailscale: HTTPS needs MagicDNS and "Enable HTTPS" on the DNS page, with the Certificate Transparency
+  acknowledgement (tailscale.com/kb/1153/enabling-https, read 2026-10-23). The serve page lists `--bg`,
+  `--https=<port>`, `status`, `off` and `reset` (tailscale.com/kb/1242/tailscale-serve, read 2026-10-23); the exact
+  command in the README is composed from those flags and is [uncertain] until run on the server.
+- R2, restic, Storage Box and Hetzner backup steps come from `docs/research/backup-r2-restic.md`; the GHCR pull token
+  (classic PAT, `read:packages`) from `docs/research/github-ci-limits.md`.
+
+### D-067 CI kept as built
+- The CI and Release workflows from Phase 1 already meet the brief (parallel jobs, caches, per-branch
+  cancel-in-progress, `ci-success`, SHA-pinned actions, `packages: write` only on `publish`). Phase runs took
+  4.5–6 minutes. The one tuning lesson (a docs-only push cancelled a code run, B-011) is handled by process, not by
+  weakening cancel-in-progress, which the brief requires.
+
+### D-068 Donut shares in the reader's locale
+- The donut legend printed "79.5%" in Greek. Shares now use the locale's decimal separator with a space before the
+  percent sign ("79,5 %"), matching the rest of the app; the chart test checks the format.

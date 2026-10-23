@@ -1,0 +1,15 @@
+# Optional auto-update (OFF by default). Install on the server (paths are examples):
+#   sudo cp deploy/finance-updater.service deploy/finance-updater.timer /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now finance-updater.timer
+[Unit]
+Description=Finance Tracker: deploy the newest main image if it changed
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/home/deploy/finance_tracker
+ExecStart=/home/deploy/finance_tracker/deploy/check-update.sh
+# The deploy waits for a pre-deploy backup and a readiness gate.
+TimeoutStartSec=30min

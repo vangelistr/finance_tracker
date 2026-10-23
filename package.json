@@ -19,7 +19,8 @@
     "test:e2e": "playwright test",
     "vapid:generate": "node scripts/generate-vapid-keys.mjs",
     "screenshots": "sh scripts/screenshots.sh",
-    "test:backup": "sh scripts/test-backup.sh"
+    "test:backup": "sh scripts/test-backup.sh",
+    "test:deploy": "bash scripts/test-deploy.sh"
   },
   "dependencies": {
     "@date-fns/tz": "1.5.0",

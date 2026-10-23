@@ -1,10 +1,10 @@
 # Progress
 
 Last updated: 2026-10-23
-Status: **Phases 0–7 done. Next: Phase 8 (Release, deploy, hardening, handoff).**
+Status: **All phases (0–8) done.** Handoff: `docs/HANDOFF.md` (Greek).
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 7: month-end report + tax/EFKA" commit on `build/finance-tracker` (CI pending at
-writing); Phase 6 `b7bd263` (CI run 39967390812 green, all jobs incl. image); Phase 5 `b56be99`
+Last verified commit: `b655cd5` "Phase 7: month-end report + tax/EFKA" (CI run 39972067875 green, all jobs);
+Phase 6 `b7bd263` (CI run 39967390812 green, all jobs incl. image); Phase 5 `b56be99`
 (static + test green on GitHub, image job cancelled by concurrency, B-011); Phase 4 `de04e98`
 (CI green); Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
 including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
@@ -21,8 +21,8 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 4 Notification worker | done | "Phase 4: notification worker" (see `git log`) |
 | 5 Savings goals + Smart Plan | done | "Phase 5: savings goals + Smart Plan" (see `git log`) |
 | 6 Investing module | done | `b7bd263` |
-| 7 Month-end report + tax/EFKA | done | "Phase 7: month-end report + tax/EFKA" (see `git log`) |
-| 8 Release, deploy, hardening, handoff | not started | — |
+| 7 Month-end report + tax/EFKA | done | `b655cd5` |
+| 8 Release, deploy, hardening, handoff | done | "Phase 8: release, deploy, hardening, handoff" (see `git log`) |
 
 ## Phase 0 summary
 
@@ -150,6 +150,23 @@ Next: Phase 8 — release workflow (reusable CI, GHCR publish with `packages: wr
 up, `/api/ready` gate, automatic rollback, tag record, prune to 3; `rollback.sh`; `finance-updater.{service,timer}`
 off by default) tested locally with Compose, CI tuning, hardening pass, final design polish, README runbook,
 `docs/EXTRAS.md`, history secret scan, `docs/HANDOFF.md` in Greek and the final Greek summary.
+
+## Phase 8 summary (Release, deploy, hardening, handoff)
+
+Verified on 2026-10-23: lint and typecheck clean; 204 tests; `npm run build` green; tour 106 captures, axe 0,
+overflow 0; detector 0 over `src/`; `npm audit --audit-level=critical`: 0 vulnerabilities; Trivy 0.76.1 CRITICAL gate
+passes on the app and backup images; actionlint 1.7.12 clean; shellcheck 0.10.0 clean on `deploy/` and
+`scripts/test-deploy.sh`; gitleaks over the full history (12 commits before this one): no leaks;
+`docs/SERVER-NOTES.md`, `docs/PROMPT.md`, `.env` and `.deploy/` are not tracked.
+`npm run test:deploy`: 17/17 (first deploy, pre-deploy backup recorded in `backup_runs`, prune to the last 3 app and
+backup images, automatic rollback when the readiness gate fails, `rollback.sh`, idempotent migrations).
+`docker compose build && up`: all services healthy, `/api/ready` ready, app image 437 MB on disk.
+New: `deploy/` (deploy, rollback, update check, Compose wrapper, systemd units), `README.md` runbook,
+`docs/EXTRAS.md`, `docs/HANDOFF.md` (Greek). Decisions D-065…D-068; blockers B-012.
+
+Not verifiable by the build (see `docs/BLOCKERS.md`): the first Release run and GHCR packages after you merge to
+`main` (B-009), server deploy and Tailscale serve (B-012), R2 (B-004), live market data (B-003), tax rules marked
+[uncertain] (B-005), branch protection (B-006).
 
 ## Open issues
 

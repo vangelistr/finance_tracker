@@ -18,10 +18,11 @@ const C = 2 * Math.PI * R;
 /** Ring chart drawn with stroke dashes; the legend carries the exact amounts and shares. */
 export function Donut({ title, slices, currency, locale, totalLabel, emptyLabel, head }: DonutProps) {
   const total = slices.reduce((s, x) => s + x.valueMinor, 0);
-  const pct = percentages(slices.map((s) => s.valueMinor));
+  // Shares in the reader's locale: "79,5 %" in Greek, "79.5 %" in English.
+  const pct = percentages(slices.map((s) => s.valueMinor)).map((x) => `${Number(x).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} %`);
   const gap = slices.length > 1 ? 1.2 : 0;
   let offset = 0;
-  const summary = slices.map((s, i) => `${s.label} ${pct[i]}%`).join(', ');
+  const summary = slices.map((s, i) => `${s.label} ${pct[i]}`).join(', ');
 
   return (
     <figure className="m-0 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
@@ -60,7 +61,7 @@ export function Donut({ title, slices, currency, locale, totalLabel, emptyLabel,
             <li key={s.key} className="flex items-center gap-2.5">
               <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: `var(--chart-${s.color})` }} />
               <span className="min-w-0 flex-1 truncate">{s.label}</span>
-              <span className="num text-ink-3">{pct[i]}%</span>
+              <span className="num whitespace-nowrap text-ink-3">{pct[i]}</span>
               <span className="num w-24 text-right font-medium">{formatMoney(s.valueMinor, currency, locale)}</span>
             </li>
           ))}
@@ -68,7 +69,7 @@ export function Donut({ title, slices, currency, locale, totalLabel, emptyLabel,
       ) : (
         <p className="text-ink-2">{emptyLabel}</p>
       )}
-      <DataTable caption={title} head={head} rows={slices.map((s, i) => [s.label, formatMoney(s.valueMinor, currency, locale), `${pct[i]}%`])} />
+      <DataTable caption={title} head={head} rows={slices.map((s, i) => [s.label, formatMoney(s.valueMinor, currency, locale), pct[i]!])} />
     </figure>
   );
 }
