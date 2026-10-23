@@ -361,7 +361,7 @@ Module off by default; while off, the market client is never constructed and a t
   rate with its date on failure. Returns are computed in the instrument's currency; EUR is for display.
 - **Stored per price**: source, bar date (exchange local), `fetchedAt` (UTC), currency, adjusted flag. Staleness label
   after one missed expected close.
-- **Starter watchlist** (editable, 10 rows): IWDA, VWCE, SXR8, IS3N, AGGH (UCITS) and VT, VTI, AAPL, MSFT, AMZN
+- **Starter watchlist** (editable, 10 rows): IWDA, VWCE, SXR8, IS3N, EUNA (UCITS) and VT, VTI, AAPL, MSFT, AMZN
   (US-listed; VT and VTI carry the EU-retail availability note).
 
 ## 9. Security design

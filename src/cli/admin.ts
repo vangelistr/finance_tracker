@@ -2,14 +2,15 @@ import { createInterface } from 'node:readline/promises';
 import { hashPassword } from '@/server/auth/password';
 import { closeDb } from '@/server/db/client';
 import { col } from '@/server/db/collections';
-import { PASSWORD_MAX, PASSWORD_MIN } from '@/lib/validation/auth';
+import { emailSchema, PASSWORD_MAX, PASSWORD_MIN } from '@/lib/validation/auth';
 
 // Recovery tool, run inside the app container:
 //   docker compose exec app node dist/admin.mjs reset-password <email>
 //   docker compose exec app node dist/admin.mjs disable-totp <email>
+//   docker compose exec app node dist/admin.mjs change-email <email> <new-email>
 //   docker compose exec app node dist/admin.mjs list-users
 
-const USAGE = 'usage: admin.mjs <reset-password|disable-totp> <email> | list-users';
+const USAGE = 'usage: admin.mjs <reset-password|disable-totp> <email> | change-email <email> <new-email> | list-users';
 
 async function readSecret(prompt: string): Promise<string> {
   const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
@@ -19,7 +20,7 @@ async function readSecret(prompt: string): Promise<string> {
 }
 
 async function main() {
-  const [command, rawEmail] = process.argv.slice(2);
+  const [command, rawEmail, rawNewEmail] = process.argv.slice(2);
   const { users, sessions } = await col();
   if (command === 'list-users') {
     for (const u of await users.find({}, { projection: { email: 1, role: 1, createdAt: 1 } }).toArray()) {
@@ -28,7 +29,7 @@ async function main() {
     return;
   }
   const email = rawEmail?.trim().toLowerCase();
-  if (!email || (command !== 'reset-password' && command !== 'disable-totp')) {
+  if (!email || (command !== 'reset-password' && command !== 'disable-totp' && command !== 'change-email')) {
     console.error(USAGE);
     process.exitCode = 2;
     return;
@@ -40,6 +41,22 @@ async function main() {
     return;
   }
   const now = new Date();
+  if (command === 'change-email') {
+    const next = emailSchema.safeParse(rawNewEmail ?? '');
+    if (!next.success) {
+      console.error('invalid new email');
+      process.exitCode = 1;
+      return;
+    }
+    if (await users.findOne({ email: next.data })) {
+      console.error('that email is already in use');
+      process.exitCode = 1;
+      return;
+    }
+    await users.updateOne({ _id: user._id }, { $set: { email: next.data, updatedAt: now } });
+    console.log('email changed');
+    return;
+  }
   if (command === 'disable-totp') {
     await users.updateOne({ _id: user._id }, { $set: { totp: { enabled: false }, updatedAt: now } });
     console.log('two-step verification disabled');

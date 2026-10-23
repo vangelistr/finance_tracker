@@ -50,8 +50,8 @@ export function marketOf(exchange: Exchange): Market {
   return EXCHANGE_INFO[exchange].market;
 }
 
-// Suffixes from the provider docs (MARKET-DATA 3.2 and 3.4). EODHD codes other than US, LSE and XETRA and every
-// Alpha Vantage code are [uncertain] until the live check; a per-instrument override wins.
+// Suffixes from the provider docs (MARKET-DATA 3.2 and 3.4). EODHD US, AS and XETRA were checked live (8.8); the other
+// EODHD codes and every Alpha Vantage code are [uncertain]; a per-instrument override wins.
 const EODHD_SUFFIX: Partial<Record<Exchange, string>> = {
   XNYS: 'US',
   XNAS: 'US',
@@ -122,7 +122,7 @@ export interface StarterInstrument {
 }
 
 /**
- * Educational starter list from docs/MARKET-DATA.md 6.1 (issuer pages read 2026-10-22). Not a recommendation. AGGH
+ * Educational starter list from docs/MARKET-DATA.md 6.1 (issuer pages read 2026-10-22). Not a recommendation. EUNA
  * (bonds) is left out of `core` so the core share stays with broad equity ETFs.
  */
 export const STARTER_WATCHLIST: StarterInstrument[] = [
@@ -130,7 +130,7 @@ export const STARTER_WATCHLIST: StarterInstrument[] = [
   { symbol: 'VWCE', exchange: 'XETR', name: 'Vanguard FTSE All-World UCITS ETF USD (Acc)', isin: 'IE00BK5BQT80', currency: 'EUR', type: 'etf', region: 'global', domicile: 'IE', terBps: 14, core: true },
   { symbol: 'SXR8', exchange: 'XETR', name: 'iShares Core S&P 500 UCITS ETF USD (Acc)', isin: 'IE00B5BMR087', currency: 'EUR', type: 'etf', region: 'us', domicile: 'IE', terBps: 7, core: true },
   { symbol: 'IS3N', exchange: 'XETR', name: 'iShares Core MSCI EM IMI UCITS ETF USD (Acc)', isin: 'IE00BKM4GZ66', currency: 'EUR', type: 'etf', region: 'emerging', domicile: 'IE', terBps: 18, core: false },
-  { symbol: 'AGGH', exchange: 'XETR', name: 'iShares Core Global Aggregate Bond UCITS ETF EUR Hedged (Acc)', isin: 'IE00BDBRDM35', currency: 'EUR', type: 'etf', region: 'global', domicile: 'IE', terBps: 10, core: false },
+  { symbol: 'EUNA', exchange: 'XETR', name: 'iShares Core Global Aggregate Bond UCITS ETF EUR Hedged (Acc)', isin: 'IE00BDBRDM35', currency: 'EUR', type: 'etf', region: 'global', domicile: 'IE', terBps: 10, core: false },
   { symbol: 'VT', exchange: 'ARCX', name: 'Vanguard Total World Stock ETF', isin: 'US9220427424', currency: 'USD', type: 'etf', region: 'global', domicile: 'US', terBps: 6, core: true },
   { symbol: 'VTI', exchange: 'ARCX', name: 'Vanguard Morningstar Total Stock Market ETF', isin: 'US9229087690', currency: 'USD', type: 'etf', region: 'us', domicile: 'US', terBps: 3, core: true },
   { symbol: 'AAPL', exchange: 'XNAS', name: 'Apple Inc.', isin: 'US0378331005', currency: 'USD', type: 'stock', region: 'us', domicile: 'US', terBps: null, core: false },

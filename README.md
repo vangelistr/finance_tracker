@@ -232,7 +232,7 @@ your `.env` backup values and the `RESTIC_PASSWORD` copy from your password mana
 ## Operations
 
 - Health: `GET /api/health` (liveness) and `GET /api/ready` (database and worker heartbeat), minimal JSON.
-- Admin CLI: `deploy/dc.sh exec app node dist/admin.mjs list-users`, `reset-password <email>` (asks for the new
+- Admin CLI: `deploy/dc.sh exec app node dist/admin.mjs list-users`, `change-email <email> <new-email>`, `reset-password <email>` (asks for the new
   password), `disable-totp <email>`.
 - Logs: `deploy/dc.sh logs -f app worker backup` (JSON lines; secrets and keys are never logged).
 - Memory limits (set in `docker-compose.yml`): mongo 768 MB (WiredTiger cache 0.25 GB), app 512 MB, worker 384 MB, backup 768 MB.

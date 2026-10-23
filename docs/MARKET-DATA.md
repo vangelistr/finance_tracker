@@ -222,7 +222,7 @@ Coverage legend: **DOC** = confirmed by provider documentation or pricing page; 
 | 2 | Vanguard FTSE All-World UCITS ETF USD (Acc) | VWCE (`VWCE.XETRA` on EODHD) | Xetra | IE00BK5BQT80 | EUR | ETF, accumulating | Ireland | 0.14% | yes | Global incl. emerging | [uncertain]: as row 1. Twelve Data needs Grow (XETR). |
 | 3 | iShares Core S&P 500 UCITS ETF USD (Acc) | SXR8 (`SXR8.XETRA`) | Xetra | IE00B5BMR087 | EUR | ETF, accumulating | Ireland | 0.07% | yes | US large cap | [uncertain]: as row 1. |
 | 4 | iShares Core MSCI EM IMI UCITS ETF USD (Acc) | IS3N (`IS3N.XETRA`) | Xetra | IE00BKM4GZ66 | EUR | ETF, accumulating | Ireland | 0.18% | no (regional satellite) | Emerging markets | [uncertain]: as row 1. |
-| 5 | iShares Core Global Aggregate Bond UCITS ETF EUR Hedged (Acc) | AGGH (`AGGH.XETRA`) | Xetra | IE00BDBRDM35 | EUR | Bond ETF, accumulating, EUR hedged | Ireland | 0.10% | no (bond; only if the module accepts bonds) | Global bonds | [uncertain]: as row 1. |
+| 5 | iShares Core Global Aggregate Bond UCITS ETF EUR Hedged (Acc) | EUNA (`EUNA.XETRA`; AGGH on `.AS`) | Xetra | IE00BDBRDM35 | EUR | Bond ETF, accumulating, EUR hedged | Ireland | 0.10% | no (bond; only if the module accepts bonds) | Global bonds | [uncertain]: as row 1. |
 | 6 | Vanguard Total World Stock ETF | VT | NYSE Arca | US9220427424 (derived, see note) | USD | ETF | United States | 0.06% | yes | Global | DOC (Twelve Data Basic: US stocks and ETFs). EODHD demo returns 403 for `VT.US` (not a demo symbol; says nothing about the free plan). |
 | 7 | Vanguard Morningstar Total Stock Market ETF (formerly shown as Total Stock Market) | VTI | NYSE Arca | US9229087690 (derived) | USD | ETF | United States | 0.03% | yes | US total market | DEMO (EODHD `VTI.US` returned 5 rows, close 379.15 on 2026-10-21). DOC (Twelve Data). |
 | 8 | Apple Inc. | AAPL | Nasdaq | US0378331005 | USD | Common stock | United States | n/a | no | US | DEMO (Twelve Data `time_series` and `eod`; EODHD `AAPL.US`). Alpha Vantage demo serves only IBM in my tests. |
@@ -384,6 +384,23 @@ Done in this research, nothing pending, except: confirm the real publish time by
 - If T6 returns data: move Twelve Data first for those exchanges (800 credits/day).
 - If T2/T3 fail with 403: US ETFs are not free on Twelve Data; use EODHD (VTI confirmed by demo) and FMP.
 
+### 8.8 Live results (2026-10-23, owner keys for Twelve Data Basic and EODHD Free)
+
+Run once, symbols and dates only. Keys came from `.env` and were not printed. FMP, Alpha Vantage and Finnhub: no keys, not run.
+
+| Provider | Call | Result |
+|---|---|---|
+| Twelve Data | `api_usage` | 200; `plan_category: basic`, `plan_limit: 8` per minute, `plan_daily_limit: 800`. |
+| Twelve Data | `time_series` VTI and AAPL, 1day, 14 to 23 Oct | 200; `meta.currency: USD`, 7 daily rows each, last 2026-10-22. VTI is served on the free key (resolves the VT/VTI [uncertain] for Basic). |
+| Twelve Data | `time_series` IWDA with `exchange=XAMS` | 404 `symbol or figi parameter is missing or invalid`. Europe is not on Basic, as documented. The adapter maps 404 to `not_covered`. |
+| Twelve Data | `time_series` AAPL with dates in the future | 400 `No data is available on the specified dates`. The adapter already treats this as an empty ok. |
+| EODHD | `eod/VTI.US` | 200, 7 rows with `adjusted_close`, last 2026-10-22. |
+| EODHD | `eod/IWDA.AS`, `eod/VWCE.XETRA`, `eod/SXR8.XETRA`, `eod/IS3N.XETRA`, `eod/EUNA.XETRA` | 200, 7 rows each, last 2026-10-22. Free covers Euronext Amsterdam (`.AS`) and Xetra (`.XETRA`) ETFs. |
+| EODHD | `eod/AGGH.XETRA` | 404: no Xetra listing under this ticker. The search by ISIN IE00BDBRDM35 gives `EUNA` on `XETRA` and `AGGH` on `AS` and `SW`. Starter list changed to EUNA. |
+| EODHD | `user` | 200, `dailyRateLimit: 20`. The call does not count: `apiRequests` was 4 after four data calls. |
+
+Not checked: LSE (`.LSE`), the exact HTTP code at the 20th call (402 per the earlier notes), the Twelve Data per-minute 429 text. EODHD calls used today: 9 of 20 (the app budget is 16).
+
 ## 9. [uncertain] list
 
 1. Twelve Data Basic: history depth (pricing page silent); whether the daily-bar `time_series` for non-demo US ETFs (VT, VTI) works on the free key (docs say US stocks and ETFs are in Basic; only AAPL and QQQ were call-confirmed with the demo key).
@@ -402,7 +419,7 @@ Done in this research, nothing pending, except: confirm the real publish time by
 
 ## 10. Implementation (Phase 6, 2026-10-23)
 
-How the findings above are used in code. No live call with a provider key has been made (no keys, B-003).
+How the findings above are used in code. Live results with the owner keys for Twelve Data and EODHD are in section 8.8.
 
 | Topic | Where | Notes |
 |---|---|---|

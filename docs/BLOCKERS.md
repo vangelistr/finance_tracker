@@ -35,12 +35,14 @@ Each item says why and what the user can do. Newest phase last.
 - **Mitigation:** The guidelines document is read once as static reference material, pinned to a commit,
   and its checklist is applied by hand during the design passes.
 
-### B-003 Live market-data verification pending (no provider keys)
+### B-003 Live market-data verification (Twelve Data and EODHD done 2026-10-23; FMP, Alpha Vantage, Finnhub pending)
 
 - **What:** `.env` has no market-data API keys (Twelve Data, EODHD, FMP, Alpha Vantage, Finnhub).
 - **Decision:** The investing module is built and tested with mocked providers. No live calls with keys were made.
 - **User action:** Add free-tier keys to `.env`, then run the live check described in `docs/MARKET-DATA.md`
   ("Pending live verification").
+- **Update 2026-10-23:** the owner added Twelve Data and EODHD keys; both adapters were checked live
+  (`docs/MARKET-DATA.md` 8.8, D-069). FMP, Alpha Vantage and Finnhub have no keys and stay optional.
 - **Phase 6 status (2026-10-23):** the provider adapters, chain, budgets, cache and FX are tested against mocked
   responses shaped like the demo-key answers in `docs/MARKET-DATA.md`. Without keys the app shows "No key" for every
   provider and uses manual prices; the FX call (Frankfurter, keyless) runs only while the module is on.

@@ -359,7 +359,7 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 - The 10-row educational list from `docs/MARKET-DATA.md` 6.1 is added the first time a user with the module on opens
   any investing page or the watchlist API, and `settings.investing.seeded` is set, so deleted rows never return. Every
   investing page calls `requireInvestingUser()` itself because Next.js renders a layout and its page concurrently.
-- AGGH (bonds) is not flagged `core`, so the core share goes to broad equity ETFs only.
+- EUNA (bonds; AGGH on Amsterdam and Swiss listings) is not flagged `core`, so the core share goes to broad equity ETFs only.
 
 ### D-054 Risk questionnaire
 - Three questions (horizon, reaction to a 20 % fall, experience), each answer 0–2 points by position: 0–2
@@ -481,3 +481,14 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 ### D-068 Donut shares in the reader's locale
 - The donut legend printed "79.5%" in Greek. Shares now use the locale's decimal separator with a space before the
   percent sign ("79,5 %"), matching the rest of the app; the chart test checks the format.
+
+### D-069 Live provider check with the owner's keys (2026-10-23)
+- Twelve Data (Basic) and EODHD (Free) keys were added by the owner; the adapters in `src/server/market/providers.ts`
+  matched both providers' documentation (endpoint, auth, parameters, response and error shapes) and needed no change.
+- Live results are in `docs/MARKET-DATA.md` section 8.8. Findings: both adapters parse real responses; EODHD Free serves
+  `.US`, `.AS` (Amsterdam) and `.XETRA`; Twelve Data Basic serves US listings and answers 404 for a non-US listing.
+- One data fix: the starter bond ETF had no Xetra listing under the ticker AGGH (404). Xetra uses EUNA (same ISIN
+  IE00BDBRDM35, found with the EODHD search by ISIN); the starter list now has EUNA on Xetra. Watchlists seeded earlier
+  keep the old row; the owner can set a provider symbol override (`EUNA.XETRA`) on it or re-add it.
+- `GET /api/user` on EODHD costs no call (the counter stayed at 4 after four data calls), so the app can read the daily
+  count from it later if wanted. Not built: out of scope for the brief.
