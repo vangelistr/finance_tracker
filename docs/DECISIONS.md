@@ -402,3 +402,45 @@ Format: ID, decision, rationale, alternatives considered. Versions were checked 
 
 ### D-059 No new dependencies
 - Phase 6 uses the platform `fetch` with `AbortSignal.timeout` (15 s) and the existing stack; nothing was added.
+
+## Phase 7 (Month-end report + tax/EFKA estimator)
+
+### D-060 Rates live only in config files and the user's copy
+- `config/tax/2025.json` and `2026.json` are the section 9 blocks of `docs/research/tax-efka.md`, copied verbatim
+  (sources, last-reviewed date, `uncertain` flags). They are bundled at build time; `tax_configs` holds each user's
+  copy, seeded on first use. The editable subset is the scale, EFKA class amounts, the unemployment contribution, VAT
+  rate and small-business limit, prepayment rate and reduction, and withholding rate and threshold; sources and flags
+  stay as reviewed. "Restore the reviewed rates" deletes the copy. A tax year without a reviewed file uses the latest
+  earlier year and says so [uncertain].
+
+### D-061 What counts as an invoice
+- Received (`done`) income from sources flagged `freelance` in the tax year; the amount is the invoice net of VAT,
+  dated at receipt (cash recognition, research 7.9 [uncertain]). Business expenses are not modelled per invoice (0).
+- The reserve event model, VAT crossing rule, EFKA floors with parallel employment, special-class expiry after five
+  insurance years, prepayment (proportional method, halved the first time) and 20 % withholding follow research
+  section 7 exactly; the worked example of section 8 is a unit test to the cent, and an integration test rebuilds it
+  from stored transactions.
+- Optional children and age rates (2026), the first-band cut and the minimum presumed income are opt-in and tagged
+  [uncertain]; the minimum applies to the year view only.
+
+### D-062 Set-aside moves
+- "Move to reserve" creates a transfer (origin `tax_set_aside`) from the invoice's account, else the first checking
+  account, into the tax reserve account (created on first use). VAT + income tax move per invoice; EFKA moves per
+  month once the month has ended. The client id `tax:invoice:<id>` / `tax:efka:<YYYY-MM>` makes each move happen once.
+- "To move now" = the year-to-date estimate (EFKA only for ended months, income tax including EFKA's release) minus
+  what moved this year, never below zero, so it never exceeds the year-to-date total shown beside it. The Smart Plan
+  surplus reserves this amount first (methodology 3.6).
+
+### D-063 Month-end report
+- Built by a pure function from the closed month and stored whole (`schemaVersion` 1); no update endpoint. The worker
+  job generates last month's report as soon as the month closes in the user's time zone (before the 1st-of-month
+  push); the history page fills in up to 24 missing closed months since the account was created. Unique
+  `{userId, month}` makes concurrent attempts a no-op (tested with racing ticks).
+- Contents: income, expenses, net, savings rate, change against the month before, top five categories, budget
+  adherence, goal progress (saved at month end and added that month), next month's fixed costs and renewals, and the
+  tax reserve against the estimated set-aside to month end (only with freelance income).
+- Print: an A4 page rule, light tokens whatever the theme, and the rail, bottom bar, banner and buttons hidden.
+
+### D-064 Horizontal overflow guard
+- The screenshot tour now fails when any screen is wider than its viewport. It found absolutely positioned
+  `sr-only` header cells escaping an unpositioned scroll wrapper on the tax tables; scroll wrappers are `relative`.

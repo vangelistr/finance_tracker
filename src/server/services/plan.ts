@@ -6,6 +6,7 @@ import { monthlyEquivalent } from '@/lib/recurrence';
 import { col } from '@/server/db/collections';
 import type { UserDoc } from '@/server/db/types';
 import { listGoals } from './goals';
+import { taxReserveDue } from './tax';
 
 export function planSettings(user: Pick<UserDoc, 'settings'>): PlanSettings {
   return { ...DEFAULT_PLAN_SETTINGS, ...(user.settings.plan ?? {}) };
@@ -15,7 +16,7 @@ export function planSettings(user: Pick<UserDoc, 'settings'>): PlanSettings {
  * Gathers the Smart Plan inputs for the user's current month (docs/allocation-methodology.md section 3) and builds
  * the plan. Complete months only: the current month never shifts its own plan.
  */
-export async function loadPlan(user: UserDoc, now = new Date(), taxReserveDueMinor = 0) {
+export async function loadPlan(user: UserDoc, now = new Date(), taxReserveDueMinor?: number) {
   const c = await col();
   const userId: ObjectId = user._id;
   const settings = planSettings(user);
@@ -24,13 +25,15 @@ export async function loadPlan(user: UserDoc, now = new Date(), taxReserveDueMin
   const window = Array.from({ length: settings.baselineWindowMonths }, (_, i) => addMonthsToMonth(current, i - settings.baselineWindowMonths));
   const essentialsWindow = window.slice(-settings.essentialsWindowMonths);
 
-  const [sources, expenses, categories, budgets, txs, goals] = await Promise.all([
+  const [sources, expenses, categories, budgets, txs, goals, taxDue] = await Promise.all([
     c.incomeSources.find({ userId }).toArray(),
     c.recurringExpenses.find({ userId, active: true }).toArray(),
     c.categories.find({ userId, kind: 'expense' }).toArray(),
     c.budgets.find({ userId }).toArray(),
     c.transactions.find({ userId, status: 'done', month: { $gte: window[0]!, $lte: current } }).toArray(),
     listGoals(userId, user.timezone, now),
+    // The estimator's set-aside not yet moved to the tax reserve comes first in the surplus (methodology 3.6).
+    taxReserveDueMinor ?? taxReserveDue(user, now),
   ]);
 
   const sourceType = new Map(sources.map((s) => [s._id.toHexString(), s.type]));
@@ -100,7 +103,7 @@ export async function loadPlan(user: UserDoc, now = new Date(), taxReserveDueMin
     goals: planGoals,
     thisMonth: {
       receivedMinor: txs.filter((t) => t.kind === 'income' && t.month === current).reduce((s, t) => s + t.amountMinor, 0),
-      taxReserveDueMinor,
+      taxReserveDueMinor: taxDue,
     },
   });
 

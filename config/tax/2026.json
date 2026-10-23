@@ -1,0 +1,448 @@
+{
+  "taxYear": 2026,
+  "lastReviewed": "2026-10-22",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "Law 5246/2025, ΦΕΚ Α΄ 198/11.11.2025 (tax reform for demography and the middle class)",
+      "url": "https://www.aade.gr/sites/default/files/2025-11/%CE%91%CE%A0%CE%9F%CE%A3%CE%A0%CE%91%CE%A3%CE%9C%CE%91%20%CE%A6%CE%95%CE%9A%20%CE%91%20198_2025%20%CE%9D%205246_2025.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S2",
+      "title": "AADE Q&A manual on tax matters, May 2026 (tax year 2025 incomes)",
+      "url": "https://www.aade.gr/sites/default/files/2026-05/egxeiridio_erotiseon_apantiseon_forologias_may_2026.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S3",
+      "title": "AADE instructions for form E1, tax year 2025 (16 March 2026)",
+      "url": "https://www.aade.gr/sites/default/files/2026-03/Odigies_E1_2026_0.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S4",
+      "title": "AADE instructions for form E3, tax year 2025 (13 March 2026)",
+      "url": "https://www.aade.gr/sites/default/files/2026-03/odigies_E3_FE_2025.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S5",
+      "title": "Income Tax Code (ν. 4172/2013), administrative codification published by the Ministry of Finance, May 2024 (arts 16, 22, 28A, 29, 43A, 61, 62, 64, 69, 70)",
+      "url": "https://minfin.gov.gr/wp-content/uploads/2024/05/%CE%A195%CE%A6%CE%97-59%CE%93_%CE%94%CE%B9%CE%BF%CE%B9%CE%BA%CE%B7%CF%84%CE%B9%CE%BA%CE%AE-%CE%9A%CF%89%CE%B4%CE%B9%CE%BA%CE%BF%CF%80%CE%BF%CE%AF%CE%B7%CF%83%CE%B7-%CE%9A%CF%8E%CE%B4%CE%B9%CE%BA%CE%B1-%CE%A6%CE%BF%CF%81%CE%BF%CE%BB%CE%BF%CE%B3%CE%AF%CE%B1%CF%82-%CE%95%CE%B9%CF%83%CE%BF%CE%B4%CE%AE%CE%BC%CE%B1%CF%84%CE%BF%CF%82.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S6",
+      "title": "Law 5162/2024, ΦΕΚ Α΄ 198/05.12.2024 (art. 3 tax on professional activity abolished for individuals; art. 6 minimum income)",
+      "url": "https://www.aade.gr/sites/default/files/2024-12/%CE%9D%205162%202024%20%CE%A6%CE%95%CE%9A%20198.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S7",
+      "title": "AADE guide for persons with disability, Oct 2023 (note on solidarity contribution)",
+      "url": "https://www.aade.gr/sites/default/files/2024-03/xristik_odig_AMEA.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S8",
+      "title": "AADE FAQ on withholding-fee certificates for tax year 2025 (19 Jan 2026)",
+      "url": "https://www.aade.gr/sites/default/files/2026-01/FAQs_vev_amoiv_epixeirimat_2025.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S9",
+      "title": "AADE FAQ on withholding returns (19 Apr 2021), item 9 on εργόσημο",
+      "url": "https://www.aade.gr/sites/default/files/2021-04/FAQs_paraktratoumenoi_fmy_19_4_21.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S11",
+      "title": "e-EFKA circular 6/2026 (contributions 2026, non-salaried)",
+      "url": "https://www.e-efka.gov.gr/sites/default/files/2026-02/%CE%91%CF%83%CF%86%CE%B1%CE%BB%CE%B9%CF%83%CF%84%CE%B9%CE%BA%CE%AD%CF%82_%CE%B5%CE%B9%CF%83%CF%86%CE%BF%CF%81%CE%AD%CF%82_%CE%AD%CF%84%CE%BF%CF%85%CF%82_2026_%CE%BC%CE%B7_%CE%BC%CE%B9%CF%83%CE%B8%CF%89%CF%84%CF%8E%CE%BD_%CE%95%CE%BB%CE%B5%CF%85%CE%B8%CE%AD%CF%81%CF%89%CE%BD_%CE%95%CF%80%CE%B1%CE%B3%CE%B3%CE%B5%CE%BB%CE%BC%CE%B1%CF%84%CE%B9%CF%8E%CE%BD_%CE%91%CF%85%CF%84%CE%BF%CE%B1%CF%80%CE%B1%CF%83%CF%87%CE%BF%CE%BB%CE%BF%CF%8D%CE%BC%CE%B5%CE%BD%CF%89%CE%BD_%CE%91%CE%B3%CF%81%CE%BF%CF%84%CF%8E%CE%BD_V1.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S12",
+      "title": "e-EFKA page: freelancers and self-employed (2026 classes)",
+      "url": "https://www.e-efka.gov.gr/el/asphalismenoi/me-misthotoi/neo-systhma-asfalistikon-eisforon/eleftheroi-epaggelmaties-aftoapasxoloumenoi",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S13",
+      "title": "e-EFKA page: new freelancers (special class, 2026)",
+      "url": "https://www.e-efka.gov.gr/el/asphalismenoi/me-misthotoi/neo-systhma-asfalistikon-eisforon/neoi-epaggelmaties",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S14",
+      "title": "e-EFKA page: parallel insurance, case 1 (freelancer + salaried job)",
+      "url": "https://www.e-efka.gov.gr/el/asphalismenoi/me-misthotoi/neo-systhma-asfalistikon-eisforon/parallhlh-asfalish/Periptosh-proth",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S15",
+      "title": "e-EFKA page: parallel insurance, new freelancer + salaried job",
+      "url": "https://www.e-efka.gov.gr/el/asphalismenoi/me-misthotoi/neo-systhma-asfalistikon-eisforon/parallhlh-asfalish/Periptosh-trith",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S16",
+      "title": "e-EFKA FAQ: insurance and contributions",
+      "url": "https://www.e-efka.gov.gr/el/sychnes-eroteseis/sychnes-eroteseis-kai-apanteseis/asphalise-eisphores",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S17",
+      "title": "e-EFKA FAQ: contributions of freelancers, self-employed and farmers",
+      "url": "https://www.e-efka.gov.gr/el/sychnes-eroteseis/asphalisi-eisphores/asphalismenoi/me-misthotoi-0/nees-eisphores-apo-112020/nees-eisphores-eleytheron-epaggelmation-aytotelos-apascholoymenon-kai-agroton",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S18",
+      "title": "e-EFKA FAQ: εργόσημο (former IKA-ETAM)",
+      "url": "https://www.e-efka.gov.gr/el/sychnes-eroteseis/asphalisi-eisphores/asphalismenoi/ergosemo/ergosemo-t-ika-etam",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S19",
+      "title": "VAT Code (ν. 5144/2024), AADE consolidated text up to 31.12.2024 (arts 26, 43, 44)",
+      "url": "https://www.aade.gr/sites/default/files/2025-05/kodikas_fpa_n.5144_2024%20kodikopoiisi_eniaio_keimeno%20@%20eos%2031.12.2024_0.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S20",
+      "title": "AADE guide to the EU small-business VAT scheme, 29 Jan 2026",
+      "url": "https://www.aade.gr/sites/default/files/2026-01/odigos_mikr_epixeiriseon.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S21",
+      "title": "AADE FAQ on the small-business VAT scheme, 30 Dec 2025",
+      "url": "https://www.aade.gr/sites/default/files/2026-01/FAQs_eidiko_kathestos_mikrwn_epixeir.pdf",
+      "read": "2026-10-22"
+    },
+    {
+      "id": "S22",
+      "title": "e-EFKA page: parallel insurance (index of the five cases)",
+      "url": "https://www.e-efka.gov.gr/el/asphalismenoi/me-misthotoi/neo-systhma-asfalistikon-eisforon/parallhlh-asfalish",
+      "read": "2026-10-22"
+    }
+  ],
+  "incomeTax": {
+    "bands": [
+      {
+        "upToMinor": 1000000,
+        "rateBps": 900
+      },
+      {
+        "upToMinor": 2000000,
+        "rateBps": 2000
+      },
+      {
+        "upToMinor": 3000000,
+        "rateBps": 2600
+      },
+      {
+        "upToMinor": 4000000,
+        "rateBps": 3400
+      },
+      {
+        "upToMinor": 6000000,
+        "rateBps": 3900
+      },
+      {
+        "upToMinor": null,
+        "rateBps": 4400
+      }
+    ],
+    "sourceId": "S1",
+    "uncertain": false,
+    "dependentChildrenRates": {
+      "band2RateBpsByChildren": [
+        2000,
+        1800,
+        1600,
+        900
+      ],
+      "band3RateBpsByChildren": [
+        2600,
+        2400,
+        2200,
+        2000,
+        1800
+      ],
+      "band3ExtraChildReductionBpsAbove4": 200,
+      "fourOrMoreChildrenBand1And2RateBps": 0,
+      "sourceId": "S1",
+      "uncertain": true
+    },
+    "ageRates": {
+      "upToIncomeMinor": 2000000,
+      "ageUpTo25RateBps": 0,
+      "age26To30RateBps": 900,
+      "appliesToFirstTwoBands": true,
+      "sourceId": "S1",
+      "uncertain": true
+    },
+    "employmentReduction": {
+      "baseByChildrenMinor": [
+        77700,
+        90000,
+        112000,
+        134000,
+        158000,
+        178000
+      ],
+      "extraChildMinor": 22000,
+      "phaseOutStartMinor": 1200000,
+      "phaseOutBpsOfIncomeOverStart": 200,
+      "appliesToBusinessIncome": false,
+      "mixedIncomeProration": "employmentShareOfTotalTaxableIncome",
+      "sourceId": "S2",
+      "uncertain": true
+    }
+  },
+  "efka": {
+    "classes": [
+      {
+        "id": "1",
+        "monthlyMinor": 25077,
+        "parts": {
+          "pensionMinor": 18509,
+          "healthCashMinor": 597,
+          "healthInKindMinor": 5971
+        }
+      },
+      {
+        "id": "2",
+        "monthlyMinor": 30093,
+        "parts": {
+          "pensionMinor": 22212,
+          "healthCashMinor": 716,
+          "healthInKindMinor": 7165
+        }
+      },
+      {
+        "id": "3",
+        "monthlyMinor": 36063,
+        "parts": {
+          "pensionMinor": 28182,
+          "healthCashMinor": 716,
+          "healthInKindMinor": 7165
+        }
+      },
+      {
+        "id": "4",
+        "monthlyMinor": 43347,
+        "parts": {
+          "pensionMinor": 35466,
+          "healthCashMinor": 716,
+          "healthInKindMinor": 7165
+        }
+      },
+      {
+        "id": "5",
+        "monthlyMinor": 51945,
+        "parts": {
+          "pensionMinor": 44064,
+          "healthCashMinor": 716,
+          "healthInKindMinor": 7165
+        }
+      },
+      {
+        "id": "6",
+        "monthlyMinor": 67587,
+        "parts": {
+          "pensionMinor": 59706,
+          "healthCashMinor": 716,
+          "healthInKindMinor": 7165
+        }
+      },
+      {
+        "id": "special",
+        "monthlyMinor": 15046,
+        "parts": {
+          "pensionMinor": 11106,
+          "healthCashMinor": 358,
+          "healthInKindMinor": 3582
+        }
+      }
+    ],
+    "defaultClassId": "1",
+    "newProfessional": {
+      "classId": "special",
+      "maxYearsOfInsurance": 5,
+      "notAvailableWithSeveralNonSalariedActivities": true,
+      "notAvailableAgainAfterInterruption": true,
+      "sourceId": "S13",
+      "uncertain": false
+    },
+    "parallelSalariedEmployment": {
+      "standardMinimumClassId": "2",
+      "newProfessionalPaysClassId": "1",
+      "salariedContributionsAreSubtracted": true,
+      "salariedContributionsMonthlyMinorUserInput": true,
+      "sourceId": "S14",
+      "uncertain": true
+    },
+    "extras": {
+      "supplementary": {
+        "appliesDefault": true,
+        "classes": [
+          {
+            "id": "1",
+            "monthlyMinor": 4657
+          },
+          {
+            "id": "2",
+            "monthlyMinor": 5613
+          },
+          {
+            "id": "3",
+            "monthlyMinor": 6688
+          }
+        ],
+        "uncertain": true
+      },
+      "lumpSum": {
+        "appliesDefault": true,
+        "classes": [
+          {
+            "id": "1",
+            "monthlyMinor": 3105
+          },
+          {
+            "id": "2",
+            "monthlyMinor": 3702
+          },
+          {
+            "id": "3",
+            "monthlyMinor": 4418
+          }
+        ],
+        "uncertain": true
+      },
+      "unemploymentMonthlyMinor": 1000,
+      "healthProfessionalsHousingMonthlyMinor": 200,
+      "extrasCollectedOnlyIfNotPaidViaSalary": true
+    },
+    "classChoiceDeadline": "2026-01-31",
+    "ifNoChoiceKeepPreviousClass": true,
+    "dueRule": {
+      "type": "lastWorkingDayOfNextMonth",
+      "uncertain": true
+    },
+    "deductibleFromBusinessIncome": true,
+    "sourceId": "S11",
+    "uncertain": false
+  },
+  "vat": {
+    "standardRateBps": 2400,
+    "reducedRatesBps": [
+      1300,
+      600,
+      400
+    ],
+    "smallBusinessThresholdMinor": 1000000,
+    "smallBusinessThresholdTest": "Greek turnover (without VAT) in both the previous and the current calendar year",
+    "smallBusinessCrossingRule": "VAT applies from the invoice that crosses the threshold, for its full value",
+    "smallBusinessInvoiceWording": "Χωρίς Φόρο Προστιθέμενης Αξίας - Απαλλαγή μικρών επιχειρήσεων",
+    "smallBusinessInputVatDeductible": false,
+    "euSme": {
+      "unionThresholdMinor": 10000000,
+      "maxNationalThresholdMinor": 8500000,
+      "note": "Cross-border scheme from 2025-01-01, VAT Code arts 44β and 44γ; not used by the estimator"
+    },
+    "filing": {
+      "normalBooks": "monthly",
+      "simplifiedBooks": "quarterly",
+      "dueRule": "lastWorkingDayOfNextMonth",
+      "twoInterestFreeInstalmentsAboveMinor": 10000,
+      "carryOverUpToMinor": 3000
+    },
+    "sourceId": "S19",
+    "uncertain": false
+  },
+  "prepayment": {
+    "rateBps": 5500,
+    "newProfessionalReductionBps": 5000,
+    "reductionYears": 1,
+    "reductionAppliesTo": "first time business income is declared",
+    "minimumAssessedMinor": 3000,
+    "excludesIncomeWithheldUnderArt64Delta": true,
+    "baseMethod": "proportionalShareOfTotalTax",
+    "alternativeBaseMethod": "marginalTax",
+    "sourceId": "S5",
+    "uncertain": true
+  },
+  "withholding": {
+    "rateBps": 2000,
+    "appliesTo": "fees for technical, management, consulting and similar services paid to natural persons by businesses and legal entities",
+    "thresholdMinor": 30000,
+    "thresholdRule": "withheld only if the transaction exceeds the threshold (Greek tax resident recipient)",
+    "baseExcludesVat": true,
+    "creditedAgainstFinalTax": true,
+    "exhaustsTax": false,
+    "generalGovernment": {
+      "servicesRateBps": 800,
+      "goodsRateBps": 400,
+      "fuelAndTobaccoRateBps": 100,
+      "exemptBelowNetPerTransactionMinor": 15000
+    },
+    "sourceId": "S5",
+    "uncertain": true
+  },
+  "other": {
+    "solidarityContribution": {
+      "applies": false,
+      "note": "Abolished for all income obtained from 2023-01-01 (law 4972/2022 art. 177, as stated by AADE).",
+      "sourceId": "S7",
+      "uncertain": false
+    },
+    "professionalFee": {
+      "applies": false,
+      "note": "Abolished for natural persons from tax year 2024 (law 5162/2024 art. 3).",
+      "sourceId": "S6",
+      "uncertain": false
+    },
+    "ergosimo": {
+      "incomeTaxWithheldAtRedemption": false,
+      "taxedAs": "employment_income",
+      "amountToDeclare": "face value minus insurance contributions, as printed on the voucher",
+      "sourceId": "S3",
+      "uncertain": false
+    },
+    "minimumPresumedIncome": {
+      "enabledByDefault": false,
+      "exemptYearsFromFirstStart": 3,
+      "year4": "minimum reduced by 2/3 (wording ambiguous)",
+      "year5": "minimum reduced by 1/3",
+      "maxMinor": 5000000,
+      "basis": "annual gross legal minimum wage with 10% step-ups per three-year period, plus staff and turnover add-ons",
+      "userMustProvideMinimumWageMinor": true,
+      "sourceId": "S1",
+      "uncertain": true
+    },
+    "newSoleProprietorFirstBandCut": {
+      "defaultEnabled": false,
+      "cutBps": 5000,
+      "years": 3,
+      "maxGrossBusinessIncomeMinor": 1000000,
+      "sourceId": "S5",
+      "uncertain": true
+    },
+    "calendar": {
+      "returnWindow": "not published yet (expected mid-March to mid-July 2027)",
+      "instalments": 8,
+      "firstInstalment": null,
+      "earlyPaymentDiscountBps": {
+        "fileByMay15": 400,
+        "fileByJun15": 300,
+        "fileByJul15": 200
+      },
+      "sourceId": "S2",
+      "uncertain": true
+    }
+  }
+}

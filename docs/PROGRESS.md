@@ -1,9 +1,10 @@
 # Progress
 
 Last updated: 2026-10-23
-Status: **Phases 0–6 done. Next: Phase 7 (Month-end report + tax/EFKA).**
+Status: **Phases 0–7 done. Next: Phase 8 (Release, deploy, hardening, handoff).**
 Branch: `build/finance-tracker` (local, created from `main` at `64a012a`).
-Last verified commit: the "Phase 6: investing module" commit on `build/finance-tracker` (CI result below); Phase 5 `b56be99`
+Last verified commit: the "Phase 7: month-end report + tax/EFKA" commit on `build/finance-tracker` (CI pending at
+writing); Phase 6 `b7bd263` (CI run 39967390812 green, all jobs incl. image); Phase 5 `b56be99`
 (static + test green on GitHub, image job cancelled by concurrency, B-011); Phase 4 `de04e98`
 (CI green); Phase 3 `172658f`; Phase 2 (`71ca02c`) CI green
 including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
@@ -19,8 +20,8 @@ including the e2e smoke job. CI on GitHub was green for Phase 1 at `c0aed5b`
 | 3 Dashboard, charts, budgets | done | "Phase 3: dashboard, charts, budgets" (see `git log`) |
 | 4 Notification worker | done | "Phase 4: notification worker" (see `git log`) |
 | 5 Savings goals + Smart Plan | done | "Phase 5: savings goals + Smart Plan" (see `git log`) |
-| 6 Investing module | done | "Phase 6: investing module" (see `git log`) |
-| 7 Month-end report + tax/EFKA | not started | — |
+| 6 Investing module | done | `b7bd263` |
+| 7 Month-end report + tax/EFKA | done | "Phase 7: month-end report + tax/EFKA" (see `git log`) |
 | 8 Release, deploy, hardening, handoff | not started | — |
 
 ## Phase 0 summary
@@ -129,12 +130,26 @@ predict, signal or "best" wording in either language outside the two disclaimers
 without errors. Market data: mocks only (no keys, B-003). Design review `docs/design-reviews/phase-6.md`.
 Decisions D-052…D-059. No new dependencies.
 
-Next: Phase 7 — month-end report (generated once per closed month by the worker on the 1st or lazily, immutable
-snapshot with the PLAN 6.7 contents, history page, print stylesheet; `reports` collection, unique `{userId, month}`)
-and the tax/EFKA estimator (`config/tax/<year>.json` per `docs/research/tax-efka.md`, editable per-user copy with sources
-and last-reviewed dates, per-invoice/month/year set-aside into the tax reserve bucket, other annual income input,
-[uncertain] marks, "estimate, not tax advice; confirm with an accountant" on every figure; feed the Smart Plan's
-`taxReserveDueMinor`). Then add `reports` and `tax` to `NAV` from `PLANNED`.
+## Phase 7 summary (Month-end report + tax/EFKA)
+
+Verified on 2026-10-23: lint and typecheck clean; **204 tests** (adds: the research worked example to the cent, both
+VAT cases and scenario A, bracket edges, the VAT crossing invoice, EFKA floors with a salaried job, extras and the
+end of the special class, first-year prepayment halving and the minimum, withholding threshold, children and age
+rates, year-to-date views; report builder; integration: report generated exactly once under racing worker ticks and
+the history page, immutable after later edits, none for an open month, every section's figures, per-user API; tax
+estimate from stored freelance income, set-aside per invoice and per ended month exactly once, the Smart Plan
+surplus reserves the unmoved amount, editable rates change the estimate and reset restores them, invalid scale
+rejected, isolation; views: every tax block labelled an estimate with the disclaimer and the [uncertain] list).
+`npm run build` green; tour 106 captures plus a print capture, axe 0, horizontal overflow 0 (new guard); detector 0;
+`docker compose build && up`: all services healthy, migration `0006-reports-tax` applied, `/api/ready` ready, worker
+without errors. Reports and tax are in the navigation. Design review `docs/design-reviews/phase-7.md`.
+Decisions D-060…D-064.
+
+Next: Phase 8 — release workflow (reusable CI, GHCR publish with `packages: write` on the publish job only, tags
+`sha-<short>`/`main`/`v*`, OCI labels), deploy scripts (`deploy/deploy.sh` with pre-deploy backup, pull, migrate,
+up, `/api/ready` gate, automatic rollback, tag record, prune to 3; `rollback.sh`; `finance-updater.{service,timer}`
+off by default) tested locally with Compose, CI tuning, hardening pass, final design polish, README runbook,
+`docs/EXTRAS.md`, history secret scan, `docs/HANDOFF.md` in Greek and the final Greek summary.
 
 ## Open issues
 

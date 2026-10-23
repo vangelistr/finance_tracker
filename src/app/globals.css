@@ -313,12 +313,73 @@
   border-width: var(--hairline, 1px);
 }
 
+/* Print (month-end report to A4/PDF): light colours whatever the theme, no navigation chrome. */
 @media print {
-  :root {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+  :root,
+  :root[data-theme='dark'],
+  :root:not([data-theme='light']) {
     color-scheme: light;
+    --ground: oklch(0.968 0.006 250);
+    --surface: oklch(1 0 0);
+    --surface-2: oklch(0.948 0.009 252);
+    --surface-hover: oklch(0.935 0.012 252);
+    --ink: oklch(0.23 0.035 262);
+    --ink-2: oklch(0.42 0.03 260);
+    --ink-3: oklch(0.5 0.025 258);
+    --rule: oklch(0.87 0.012 255);
+    --rule-strong: oklch(0.76 0.018 256);
+
+    --rail: oklch(0.285 0.078 263);
+    --rail-2: oklch(0.335 0.085 263);
+    --rail-ink: oklch(0.985 0.004 250);
+    --rail-ink-2: oklch(0.84 0.035 258);
+    --rail-rule: oklch(0.4 0.07 263);
+
+    --accent: oklch(0.5 0.165 257);
+    --accent-hover: oklch(0.45 0.165 257);
+    --accent-ink: oklch(0.99 0 0);
+    --accent-soft: oklch(0.93 0.035 255);
+    --focus: oklch(0.55 0.19 257);
+
+    --income: oklch(0.5 0.13 152);
+    --income-soft: oklch(0.94 0.04 152);
+    --spend: oklch(0.52 0.19 28);
+    --spend-soft: oklch(0.95 0.03 28);
+    --goal: oklch(0.47 0.1 70);
+    --goal-fill: oklch(0.72 0.14 78);
+    --goal-soft: oklch(0.95 0.045 85);
+    --tax: oklch(0.48 0.15 302);
+    --tax-soft: oklch(0.95 0.03 302);
+    --warning: oklch(0.5 0.11 65);
+    --warning-fill: oklch(0.8 0.15 78);
+    --warning-soft: oklch(0.96 0.05 85);
+    --danger: oklch(0.5 0.2 27);
+    --danger-soft: oklch(0.95 0.03 27);
+
+    --chart-1: oklch(0.5 0.15 257);
+    --chart-2: oklch(0.6 0.15 48);
+    --chart-3: oklch(0.52 0.11 175);
+    --chart-4: oklch(0.55 0.18 340);
+    --chart-5: oklch(0.6 0.12 95);
+    --chart-6: oklch(0.47 0.15 295);
+    --chart-7: oklch(0.55 0.17 22);
+    --chart-8: oklch(0.52 0.04 250);
+
+    --shadow-overlay: 0 12px 32px -8px oklch(0.2 0.04 262 / 0.28), 0 2px 6px oklch(0.2 0.04 262 / 0.12);
+    --scrim: oklch(0.18 0.03 262 / 0.45);
+  }
+  body {
+    background: white;
   }
   .no-print {
     display: none !important;
+  }
+  section {
+    break-inside: avoid-page;
   }
 }
 

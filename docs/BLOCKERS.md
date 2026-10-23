@@ -61,6 +61,8 @@ Each item says why and what the user can do. Newest phase last.
 - **Decision:** The estimator uses the conservative reading, marks each affected figure [uncertain] in the UI and
   the config, and labels everything "estimate, not tax advice; confirm with an accountant".
 - **User action:** Ask an accountant to confirm the list; edit the per-year config in the app if a value differs.
+- **Phase 7 status (2026-10-23):** the estimator applies the conservative reading of each item; the tax page lists
+  the open questions and tags every [uncertain] rate and option next to the figure it affects.
 
 ### B-006 Branch protection on `main` not confirmed for a Free private repo
 
@@ -111,3 +113,4 @@ Each item says why and what the user can do. Newest phase last.
 - **Mitigation:** the image built locally and ran healthy (Phase 5 summary), and the Phase 6 push rebuilds the image
   from a tree that contains Phase 5. Its result is recorded in `docs/PROGRESS.md`.
 - **Lesson for the run:** do not push a docs-only commit while a phase run is still in progress.
+- **Resolved:** the Phase 6 run (39967390812) passed every job, including the image build.

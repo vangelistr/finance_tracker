@@ -5,6 +5,9 @@ import type { Schedule } from '@/lib/recurrence';
 import type { PlanSettings } from '@/lib/plan';
 import type { Exchange, InstrumentType, ProviderId, ProviderSymbols, Region } from '@/lib/investing/instruments';
 import type { InvestingSettings } from '@/lib/investing/settings';
+import type { TaxConfig } from '@/lib/tax/config';
+import type { TaxProfile } from '@/lib/tax/estimate';
+import type { ReportData } from '@/lib/report';
 
 export type Locale = 'el' | 'en';
 export type Theme = 'system' | 'light' | 'dark';
@@ -27,6 +30,8 @@ export interface UserSettings {
   plan?: Partial<PlanSettings>;
   /** Investing module settings; missing keys use DEFAULT_INVESTING_SETTINGS. `seeded` marks the starter list as added once. */
   investing?: Partial<InvestingSettings> & { seeded?: boolean };
+  /** Tax/EFKA estimator profile; missing keys use DEFAULT_TAX_PROFILE. */
+  tax?: Partial<TaxProfile>;
 }
 
 export interface UserDoc {
@@ -375,6 +380,29 @@ export interface FxRateDoc {
   rates: Record<string, number>;
   fetchedAt: Date;
   expiresAt: Date;
+}
+
+// ---- Month-end report and tax estimator (Phase 7) ----
+
+/** The user's editable copy of a tax year's rates, seeded from config/tax/<year>.json. */
+export interface TaxConfigDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  taxYear: number;
+  config: TaxConfig;
+  edited: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** Immutable snapshot of a closed month: computed figures, never references. */
+export interface ReportDoc {
+  _id: ObjectId;
+  userId: ObjectId;
+  month: string;
+  generatedAt: Date;
+  schemaVersion: number;
+  data: ReportData;
 }
 
 // Re-exported so domain documents added in later phases share one import path.

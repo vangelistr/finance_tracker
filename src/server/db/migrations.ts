@@ -44,6 +44,12 @@ export const MIGRATIONS: Migration[] = [
       // watchlist is added per user the first time the module's pages open (D-053).
     },
   },
+  {
+    id: '0006-reports-tax',
+    up: async () => {
+      // Month-end reports and per-user tax configs (indexes from ensureIndexes). Configs are seeded on first use.
+    },
+  },
 ];
 
 export async function runMigrations(db: Db, migrations: Migration[] = MIGRATIONS): Promise<string[]> {

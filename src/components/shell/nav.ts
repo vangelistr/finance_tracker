@@ -32,17 +32,13 @@ export const NAV: NavItem[] = [
   { key: 'goals', href: '/goals', icon: PiggyBank },
   { key: 'plan', href: '/plan', icon: BarChart3 },
   { key: 'investing', href: '/investing', icon: LineChart, investingOnly: true },
+  { key: 'reports', href: '/reports', icon: FileText },
+  { key: 'tax', href: '/tax', icon: Receipt },
   { key: 'income', href: '/income', icon: Wallet },
   { key: 'fixed', href: '/fixed', icon: Repeat },
   { key: 'accounts', href: '/accounts', icon: Landmark },
   { key: 'categories', href: '/categories', icon: Tags },
   { key: 'settings', href: '/settings', icon: Settings },
-];
-
-// Planned destinations, listed so the shell layout is designed for its final size.
-export const PLANNED: NavItem[] = [
-  { key: 'reports', href: '/reports', icon: FileText },
-  { key: 'tax', href: '/tax', icon: Receipt },
 ];
 
 /** Mobile bottom bar: the first two and the last destination flank the central Add button; the rest go to More. */

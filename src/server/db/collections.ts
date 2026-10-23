@@ -27,6 +27,8 @@ import type {
   ProviderOutcomeDoc,
   ProviderUsageDoc,
   FxRateDoc,
+  TaxConfigDoc,
+  ReportDoc,
 } from './types';
 
 export function collectionsOf(db: Db) {
@@ -57,6 +59,8 @@ export function collectionsOf(db: Db) {
     providerOutcomes: db.collection<ProviderOutcomeDoc>('provider_outcomes'),
     providerUsage: db.collection<ProviderUsageDoc>('provider_usage'),
     fxRates: db.collection<FxRateDoc>('fx_rates'),
+    taxConfigs: db.collection<TaxConfigDoc>('tax_configs'),
+    reports: db.collection<ReportDoc>('reports'),
   };
 }
 
@@ -142,6 +146,8 @@ export const INDEXES: Record<string, IndexDescription[]> = {
   provider_outcomes: [{ key: { until: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
   provider_usage: [{ key: { expiresAt: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
   fx_rates: [{ key: { expiresAt: 1 }, name: 'ttl', expireAfterSeconds: 0 }],
+  tax_configs: [{ key: { userId: 1, taxYear: 1 }, name: 'user_year_unique', unique: true }],
+  reports: [{ key: { userId: 1, month: 1 }, name: 'user_month_unique', unique: true }],
 };
 
 export async function ensureIndexes(db: Db): Promise<void> {

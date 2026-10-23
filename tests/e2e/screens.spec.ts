@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { MongoClient } from 'mongodb';
-import { a11yIssues, captureAll, OWNER } from './helpers';
+import { MongoClient, ObjectId } from 'mongodb';
+import { a11yIssues, captureAll, overflowIssues, OWNER } from './helpers';
 
 // Screenshot and accessibility tour over a fresh database (run with `npm run screenshots`). Steps depend on each other.
 test.describe.configure({ mode: 'serial' });
@@ -143,7 +143,9 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   expect((await page.goto('/investing'))!.status()).toBe(404);
   await page.goto('/settings');
   await expect(page.getByRole('link', { name: 'Επενδύσεις' })).toHaveCount(0);
+  const saved = page.waitForResponse((r) => r.url().endsWith('/api/settings') && r.request().method() === 'PATCH');
   await page.getByRole('switch', { name: /Ενότητα επενδύσεων/ }).click();
+  expect((await saved).ok()).toBe(true);
   await expect(page.getByRole('switch', { name: /Ενότητα επενδύσεων/ })).toHaveAttribute('aria-checked', 'true');
   await page.goto('/investing/watchlist');
   await expect(page.getByText('10 από 40 μέσα')).toBeVisible();
@@ -196,6 +198,45 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   await captureAll(page, 'investing-add');
   await page.keyboard.press('Escape');
 
+  // Tax estimator and month-end reports: a freelance source with invoices this year, and an account opened two
+  // months ago so closed months exist.
+  if (process.env.MONGO_URL) {
+    const client = await MongoClient.connect(process.env.MONGO_URL);
+    const db = client.db();
+    const owner = (await db.collection('users').findOne({ role: 'owner' }))!;
+    const now = new Date();
+    const year = now.getUTCFullYear();
+    const month = now.getUTCMonth() + 1;
+    await db.collection('users').updateOne({ _id: owner._id }, { $set: { createdAt: new Date(now.getTime() - 70 * 86_400_000), 'settings.tax': { employmentIncomeMinor: 1800000, efkaClassId: 'special', insuranceStartYear: year - 1 } } });
+    const sourceId = new ObjectId();
+    await db.collection('income_sources').insertOne({ _id: sourceId, userId: owner._id, name: 'Τιμολόγια πελατών', type: 'one_time', categoryId: null, currency: 'EUR', accountId: null, schedule: null, expectedNetMinor: null, expectedGrossMinor: null, freelance: true, active: true, createdAt: now, updatedAt: now });
+    const food = await db.collection('categories').findOne({ userId: owner._id, name: 'Σούπερ μάρκετ' });
+    const docs = [];
+    for (let m = 3; m < month; m++) {
+      const mm = String(m).padStart(2, '0');
+      docs.push({ kind: 'income', amountMinor: 150000, localDate: `${year}-${mm}-15`, incomeSourceId: sourceId, categoryId: null });
+      docs.push({ kind: 'expense', amountMinor: 8000 + m * 900, localDate: `${year}-${mm}-08`, incomeSourceId: null, categoryId: food?._id ?? null });
+    }
+    await db.collection('transactions').insertMany(
+      docs.map((d) => ({ _id: new ObjectId(), userId: owner._id, status: 'done', grossMinor: null, accountId: null, toAccountId: null, recurringExpenseId: null, month: d.localDate.slice(0, 7), note: '', origin: 'manual', occurrenceKey: null, clientId: null, doneAt: now, createdAt: now, updatedAt: now, ...d })),
+    );
+    await client.close();
+  }
+  await page.goto('/tax');
+  await expect(page.getByRole('heading', { name: /Για μεταφορά στο αποθεματικό φόρων τώρα/ })).toBeVisible();
+  await captureAll(page, 'tax');
+  await page.getByRole('button', { name: 'Μεταφορά στο αποθεματικό' }).first().click();
+  await expect(page.getByText(/^Μεταφέρθηκε /).first()).toBeVisible();
+  await page.goto('/reports');
+  await captureAll(page, 'reports');
+  await page.getByRole('link').filter({ hasText: /\d{4}/ }).first().click();
+  await expect(page.getByText(/Στιγμιότυπο της/)).toBeVisible();
+  await captureAll(page, 'report');
+  await page.setViewportSize({ width: 794, height: 1123 });
+  await page.emulateMedia({ media: 'print', colorScheme: 'dark' });
+  await page.screenshot({ path: 'artifacts/screenshots/report-print.png', fullPage: true });
+  await page.emulateMedia({ media: 'screen' });
+
   // Quick-add sheet itself
   await page.setViewportSize({ width: 375, height: 812 });
   await page.emulateMedia({ colorScheme: 'light' });
@@ -237,6 +278,9 @@ test('first run, onboarding, every main screen, offline queue', async ({ page, c
   await captureAll(page, 'offline');
 
   writeFileSync('artifacts/screenshots/a11y.json', JSON.stringify(a11yIssues, null, 2));
+  writeFileSync('artifacts/screenshots/overflow.json', JSON.stringify(overflowIssues, null, 2));
+  // No screen may scroll sideways (Greek text and money never overflow).
+  expect(overflowIssues).toEqual([]);
   const blocking = a11yIssues.filter((i) => i.impact === 'serious' || i.impact === 'critical');
   expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
 });

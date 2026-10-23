@@ -16,7 +16,7 @@ export interface TransactionInput {
   localDate: LocalDate;
   note: string;
   clientId: string | null;
-  origin: Extract<TransactionOrigin, 'manual' | 'offline'>;
+  origin: Extract<TransactionOrigin, 'manual' | 'offline' | 'tax_set_aside'>;
 }
 
 export interface TransactionQuery {

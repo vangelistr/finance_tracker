@@ -42,13 +42,13 @@ export function AppShell({ userName, investingEnabled, quickAdd, banner, childre
   }
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[16rem_1fr]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[16rem_1fr] print:block">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-surface focus:px-3 focus:py-2">
         {t('skipToContent')}
       </a>
 
       {/* Desktop rail */}
-      <div className="hidden bg-rail lg:block">
+      <div className="hidden bg-rail lg:block print:hidden">
         <aside className="sticky top-0 flex h-dvh flex-col text-rail-ink">
           <div className="px-5 pt-6 pb-5">
             <Wordmark name={tApp('name')} />
@@ -79,14 +79,14 @@ export function AppShell({ userName, investingEnabled, quickAdd, banner, childre
       </div>
 
       <div className="flex min-h-dvh min-w-0 flex-col">
-        <main id="main" className="mx-auto w-full max-w-[72rem] flex-1 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-28 sm:px-6 lg:px-10 lg:pt-8 lg:pb-12">
-          {banner}
+        <main id="main" className="mx-auto w-full max-w-[72rem] flex-1 px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-28 sm:px-6 lg:px-10 lg:pt-8 lg:pb-12 print:max-w-none print:p-0">
+          {banner && <div className="print:hidden">{banner}</div>}
           {children}
         </main>
       </div>
 
       {/* Phone bottom bar */}
-      <nav aria-label={t('main')} className="fixed inset-x-0 bottom-0 z-30 bg-rail text-rail-ink pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <nav aria-label={t('main')} className="fixed inset-x-0 bottom-0 z-30 bg-rail text-rail-ink pb-[env(safe-area-inset-bottom)] lg:hidden print:hidden">
         <ul className="mx-auto grid h-16 max-w-lg grid-cols-5 items-stretch">
           {barItems.slice(0, 2).map((item) => (
             <li key={item.key}>
