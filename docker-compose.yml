@@ -29,7 +29,7 @@ x-app-env: &app-env
 
 services:
   mongo:
-    image: mongo:7.0.45-jammy@sha256:7fba8c37d681a79f22a85d2b06bd5ed121a7973c0a6ca20ed4887bb0a1548ce0
+    image: mongo:7.0.48-jammy@sha256:fb8e0773cddc25d3450171301e3fa0e7398c3e6b02afc3dc6e2780196b62726a
     command: ['--wiredTigerCacheSizeGB', '0.25']
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
